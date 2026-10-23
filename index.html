@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Большой день Маяковского — Театральные программы Николая Пасечника</title>
+  <meta name="description" content="Выездные и стационарные театральные программы о Владимире Маяковском для школ, гимназий, ДК, библиотек и театров. Закупка по 44-ФЗ / 223-ФЗ и по билетам.">
+  
+  <!-- Иконка сайта (Favicon) в адресной строке -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23E1251B'/><text x='50%' y='54%' dominant-baseline='central' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='900' font-size='52'>ВМ</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandRed: '#E1251B',
+            brandGold: '#F59E0B',
+            bgWarm: '#FAF7F2',
+            inkDark: '#171717'
+          },
+          fontFamily: {
+            heading: ['Oswald', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .card-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+  </style>
+</head>
+<body class="bg-bgWarm text-inkDark font-sans antialiased selection:bg-brandRed selection:text-white">
+
+  <!-- Светлая шапка сайта -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-6">
+      
+      <a href="#" class="font-heading text-xl sm:text-2xl tracking-wide uppercase font-bold text-inkDark shrink-0 whitespace-nowrap hover:text-brandRed transition">
+        Большой день Маяковского
+      </a>
+
+      <nav class="hidden xl:flex items-center gap-8 text-sm font-medium text-stone-600 whitespace-nowrap">
+        <a href="#programs" class="hover:text-brandRed transition">Программы</a>
+        <a href="#details" class="hover:text-brandRed transition">О спектаклях</a>
+        <a href="#gov" class="hover:text-brandRed transition">Школам и ДК (44-ФЗ)</a>
+        <a href="#video" class="hover:text-brandRed transition">Видео</a>
+        <a href="#reviews" class="hover:text-brandRed transition">Благодарности</a>
+      </nav>
+
+      <div class="flex items-center gap-6 shrink-0 whitespace-nowrap">
+        <a href="tel:+79950056820" class="hidden md:inline-block font-bold text-sm text-inkDark hover:text-brandRed transition">
+          +7 (995) 005-68-20
+        </a>
+        <button onclick="openModal('Заявка с шапки сайта')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-2.5 text-sm rounded-sm shadow-sm transition whitespace-nowrap">
+          Пригласить проект
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Главный экран -->
+  <section class="relative overflow-hidden py-12 sm:py-20 border-b border-stone-200 bg-gradient-to-b from-white to-bgWarm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 grid md:grid-cols-12 gap-10 items-center">
+      
+      <div class="md:col-span-7 space-y-6">
+        <div class="inline-flex flex-wrap items-center gap-2 bg-red-50 border border-red-200 px-3.5 py-1.5 rounded-full text-xs font-semibold text-brandRed">
+          <span>🎭 Выездные и стационарные показы • Санкт-Петербург и Москва</span>
+        </div>
+
+        <h1 class="font-heading text-4xl sm:text-6xl uppercase font-bold leading-tight text-inkDark">
+          Живой Маяковский <span class="text-brandRed">для школ, театров и арт-площадок</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-stone-600 max-w-2xl leading-relaxed">
+          Три авторские сценические программы для разных возрастов: от весёлого детского интерактива с нейросетями (5+) и лекции о русском авангарде (12+) до мощного моноспектакля по программе старших классов (14+).
+        </p>
+
+        <div class="grid sm:grid-cols-3 gap-4 pt-1">
+          <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
+            <p class="font-bold text-sm text-inkDark">✓ Любая площадка</p>
+            <p class="text-xs text-stone-500 mt-1">Проводим в актовом зале школы, библиотеке, ДК или театре</p>
+          </div>
+          <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
+            <p class="font-bold text-sm text-inkDark">✓ 44-ФЗ / 223-ФЗ</p>
+            <p class="text-xs text-stone-500 mt-1">Размещены в ГИС «Электронный магазин» СПб</p>
+          </div>
+          <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
+            <p class="font-bold text-sm text-inkDark">✓ Или по билетам</p>
+            <p class="text-xs text-stone-500 mt-1">Возможен показ для классов без нагрузки на бюджет школы</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <button onclick="openModal('Узнать свободные даты и условия')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider text-base sm:text-lg px-8 py-4 rounded-sm shadow-md transition">
+            Оставить заявку
+          </button>
+          <a href="#video" class="bg-white hover:bg-stone-100 border border-stone-300 text-inkDark font-heading uppercase tracking-wider text-base sm:text-lg px-7 py-4 rounded-sm transition">
+            ▶ Смотреть видео
+          </a>
+        </div>
+
+        <div class="bg-amber-50 border-l-4 border-brandGold p-4 rounded-r shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-800 font-bold">Ближайший спектакль • 8 ноября в 12:00</span>
+            <p class="font-semibold text-sm sm:text-base text-inkDark mt-0.5">«Маяковский — детям» (5+) в ТП «АртРазБег» (ул. Савушкина, 139)</p>
+          </div>
+          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" class="shrink-0 bg-inkDark hover:bg-brandRed text-white font-heading uppercase text-sm px-5 py-2.5 rounded-sm tracking-wider text-center transition">
+            Купить билет →
+          </a>
+        </div>
+      </div>
+
+      <!-- Главное фото проекта (загружается напрямую с серверов ВК) -->
+      <div class="md:col-span-5">
+        <div class="bg-white p-3 rounded-xl border border-stone-200 shadow-xl">
+          <div class="aspect-[4/5] rounded-lg overflow-hidden bg-stone-200 relative flex flex-col justify-end">
+            <img id="img-hero" src="https://sun9-85.vkuserphoto.ru/s/v1/ig2/3TdZG54QnqcccfgUqTTEDKV2ydJOGXU2Ed1j-4UHq0T4eaeU1zJrYMMn9KR84y21pLKvcOt5qoOlQRcSVH6v8YDl.jpg?quality=95&as=32x44,48x65,72x98,108x147,160x218,240x327,360x491,480x654,540x736,640x872,720x981,1080x1472,1280x1744,1440x1962,1585x2160&from=bu&u=UQP7vyGwR1_46Mo7yYpKj7lMdG-uPWM8f1aRTjX_EWQ&cs=1585x0" referrerpolicy="no-referrer" alt="Николай Пасечник в образе Владимира Маяковского" class="absolute inset-0 w-full h-full object-cover">
+            <div class="relative z-10 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-6 text-white mt-auto">
+              <span class="bg-brandRed text-white font-heading uppercase text-xs px-2.5 py-1 tracking-widest">Автор и исполнитель</span>
+              <h2 class="font-heading text-2xl sm:text-3xl uppercase font-bold mt-2">Николай Пасечник</h2>
+              <p class="text-sm text-stone-200 mt-1">
+                Артист, режиссёр и театральный продюсер
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Витрина 4 форматов -->
+  <section id="programs" class="py-16 sm:py-20 border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+        <div>
+          <span class="text-brandRed font-heading uppercase tracking-widest text-sm font-bold">Выбор программы</span>
+          <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold mt-1">Для каждой возрастной группы</h2>
+        </div>
+        <p class="text-stone-600 text-sm max-w-sm">
+          Все программы подходят для проведения в актовом зале школы, в библиотеке, ДК или на театральной сцене.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl border border-stone-200 p-6 flex flex-col justify-between card-hover">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">1–4 классы (45 мин)</span>
+              <span class="bg-red-100 text-brandRed font-heading font-bold px-2.5 py-0.5 rounded text-sm">5+</span>
+            </div>
+            <h3 class="font-heading text-2xl uppercase font-bold mb-2 text-inkDark">Маяковский — детям</h3>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Весёлый интерактивный спектакль с участием нейросетей: оживший на экране герой видит и слышит ребят в зале.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-stone-100 flex items-center justify-between">
+            <a href="#play-kids" class="text-brandRed font-heading uppercase text-sm tracking-wider font-bold hover:underline">
+              Описание →
+            </a>
+            <button onclick="openModal('Маяковский — детям (5+)')" class="text-xs font-semibold bg-stone-100 hover:bg-brandRed hover:text-white px-3.5 py-1.5 rounded transition">
+              Оставить заявку
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-6 flex flex-col justify-between card-hover">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">6–9 классы (60 мин)</span>
+              <span class="bg-red-100 text-brandRed font-heading font-bold px-2.5 py-0.5 rounded text-sm">12+</span>
+            </div>
+            <h3 class="font-heading text-2xl uppercase font-bold mb-2 text-inkDark">Маяковский — икона стиля</h3>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Увлекательная лекция-перформанс о русском авангарде, плакатах РОСТА, дизайне, рекламе и создании личного бренда.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-stone-100 flex items-center justify-between">
+            <a href="#play-style" class="text-brandRed font-heading uppercase text-sm tracking-wider font-bold hover:underline">
+              Описание →
+            </a>
+            <button onclick="openModal('Маяковский — икона стиля (12+)')" class="text-xs font-semibold bg-stone-100 hover:bg-brandRed hover:text-white px-3.5 py-1.5 rounded transition">
+              Оставить заявку
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-stone-200 p-6 flex flex-col justify-between card-hover">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">9–11 классы и взрослые (75 мин)</span>
+              <span class="bg-red-100 text-brandRed font-heading font-bold px-2.5 py-0.5 rounded text-sm">14+</span>
+            </div>
+            <h3 class="font-heading text-2xl uppercase font-bold mb-2 text-inkDark">Маяковский. Любовная лодка</h3>
+            <p class="text-stone-600 text-sm leading-relaxed">
+              Моноспектакль-исповедь по школьной программе старших классов: стихи, документы эпохи и личная драма поэта.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-stone-100 flex items-center justify-between">
+            <a href="#play-boat" class="text-brandRed font-heading uppercase text-sm tracking-wider font-bold hover:underline">
+              Описание →
+            </a>
+            <button onclick="openModal('Маяковский. Любовная лодка (14+)')" class="text-xs font-semibold bg-stone-100 hover:bg-brandRed hover:text-white px-3.5 py-1.5 rounded transition">
+              Оставить заявку
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-red-50/70 rounded-xl border-2 border-brandRed p-6 flex flex-col justify-between card-hover">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-brandRed">Комплексный спецпроект</span>
+              <span class="bg-brandRed text-white font-heading font-bold px-2.5 py-0.5 rounded text-sm">ВСЕ</span>
+            </div>
+            <h3 class="font-heading text-2xl uppercase font-bold mb-2 text-inkDark">Большой день Маяковского</h3>
+            <p class="text-stone-700 text-sm leading-relaxed">
+              Все три программы в один день для разных параллелей школы или для фестиваля в ДК / библиотеке.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-red-200 flex items-center justify-between">
+            <a href="#gov" class="text-brandRed font-heading uppercase text-sm tracking-wider font-bold hover:underline">
+              Условия →
+            </a>
+            <button onclick="openModal('Фестиваль «Большой день Маяковского»')" class="text-xs font-semibold bg-brandRed text-white px-3.5 py-1.5 rounded transition">
+              Оставить заявку
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Подробное описание программ с фотографиями -->
+  <section id="details" class="py-16 sm:py-24 space-y-16 max-w-7xl mx-auto px-4 sm:px-8">
+    
+    <!-- 1. Маяковский - детям -->
+    <div id="play-kids" class="grid md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-10 rounded-xl border border-stone-200 shadow-sm">
+      <div class="md:col-span-5 aspect-[4/3] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative">
+        <img id="img-kids" src="kids.jpg" referrerpolicy="no-referrer" alt="Маяковский — детям" class="w-full h-full object-cover">
+      </div>
+      <div class="md:col-span-7 space-y-4">
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-red-100 text-brandRed font-heading uppercase text-xs px-3 py-1 rounded font-bold tracking-wider">5–11 лет (Детские сады и 1–4 класс)</span>
+          <span class="bg-stone-100 text-stone-700 font-heading uppercase text-xs px-3 py-1 rounded tracking-wider">Продолжительность: 45 минут</span>
+        </div>
+        <h3 class="font-heading text-3xl sm:text-4xl uppercase font-bold text-inkDark">Маяковский — детям</h3>
+        <p class="text-stone-700 leading-relaxed">
+          Весёлый интерактивный спектакль, в котором дети не просто слушают знаменитые стихи Владимира Маяковского («Кем быть?», «Что такое хорошо и что такое плохо?»), но и сами становятся участниками действия. С помощью камер, датчиков и нейросетей цифровой персонаж на экране в реальном времени видит движения детей, отвечает им и играет с залом.
+        </p>
+        <ul class="text-sm text-stone-600 space-y-1.5 pt-1">
+          <li>✓ <strong>Педагогическая ценность:</strong> в игровой форме мотивирует детей учиться, читать и уважать труд.</li>
+          <li>✓ <strong>Никакой скуки:</strong> загадки, импровизация и живой диалог с каждым рядом в зале.</li>
+        </ul>
+        <div class="flex flex-wrap gap-3 pt-3">
+          <button onclick="openModal('Маяковский — детям (5+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
+            Оставить заявку
+          </button>
+          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-6 py-3 rounded-sm font-heading uppercase tracking-wider transition">
+            Купить билет на 8 ноября
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Маяковский - икона стиля -->
+    <div id="play-style" class="grid md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-10 rounded-xl border border-stone-200 shadow-sm">
+      <div class="md:col-span-5 md:order-2 aspect-[4/3] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative">
+        <img id="img-style" src="style.jpg" referrerpolicy="no-referrer" alt="Маяковский — икона стиля" class="w-full h-full object-cover">
+      </div>
+      <div class="md:col-span-7 md:order-1 space-y-4">
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-red-100 text-brandRed font-heading uppercase text-xs px-3 py-1 rounded font-bold tracking-wider">12+ (6–11 классы и молодёжь)</span>
+          <span class="bg-stone-100 text-stone-700 font-heading uppercase text-xs px-3 py-1 rounded tracking-wider">Продолжительность: 60 минут</span>
+        </div>
+        <h3 class="font-heading text-3xl sm:text-4xl uppercase font-bold text-inkDark">Маяковский — икона стиля</h3>
+        <p class="text-stone-700 leading-relaxed">
+          Динамичная лекция-перформанс о том, как Владимир Маяковский вместе с Александром Родченко создал современный графический дизайн, копирайтинг, социальный плакат («Окна РОСТА») и собственный узнаваемый визуальный образ.
+        </p>
+        <ul class="text-sm text-stone-600 space-y-1.5 pt-1">
+          <li>✓ <strong>Отлично для профориентации и МХК:</strong> соединяет литературу, историю, дизайн и медиа.</li>
+          <li>✓ <strong>Удерживает внимание подростков:</strong> редкие архивные кадры, стихи и живой перформанс.</li>
+        </ul>
+        <div class="pt-3">
+          <button onclick="openModal('Маяковский — икона стиля (12+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
+            Оставить заявку
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Маяковский. Любовная лодка -->
+    <div id="play-boat" class="grid md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-10 rounded-xl border border-stone-200 shadow-sm">
+      <div class="md:col-span-5 aspect-[4/3] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative">
+        <img id="img-boat" src="boat.jpg" referrerpolicy="no-referrer" alt="Маяковский. Любовная лодка" class="w-full h-full object-cover">
+      </div>
+      <div class="md:col-span-7 space-y-4">
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-red-100 text-brandRed font-heading uppercase text-xs px-3 py-1 rounded font-bold tracking-wider">14+ (Старшие классы, студенты, взрослые)</span>
+          <span class="bg-stone-100 text-stone-700 font-heading uppercase text-xs px-3 py-1 rounded tracking-wider">Продолжительность: 75 минут</span>
+        </div>
+        <h3 class="font-heading text-3xl sm:text-4xl uppercase font-bold text-inkDark">Маяковский. Любовная лодка</h3>
+        <p class="text-stone-700 leading-relaxed">
+          Что осталось от Маяковского за пределами бронзового монумента и школьных учебников? Драматический моноспектакль на стыке документального театра и поэтического манифеста. От ранней лирики и «Облака в штанах» до «Юбилейного», «Разговора с фининспектором» и последнего письма.
+        </p>
+        <ul class="text-sm text-stone-600 space-y-1.5 pt-1">
+          <li>✓ <strong>Помощь в подготовке к ОГЭ и ЕГЭ:</strong> ключевые произведения кодификатора оживают на сцене.</li>
+          <li>✓ <strong>Мобильный техрайдер:</strong> быстро разворачивается на любой сцене за 30 минут.</li>
+        </ul>
+        <div class="pt-3">
+          <button onclick="openModal('Маяковский. Любовная лодка (14+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
+            Оставить заявку
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Блок для школ и госучреждений (44-ФЗ / 223-ФЗ и Билеты) -->
+  <section id="gov" class="py-16 sm:py-20 bg-white border-y border-stone-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 grid md:grid-cols-12 gap-10 items-center">
+      <div class="md:col-span-7 space-y-5">
+        <span class="text-brandRed font-heading uppercase tracking-widest text-sm font-bold">Удобные варианты проведения для школ, ДК и библиотек</span>
+        <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold text-inkDark">
+          Как организовать показ на вашей площадке
+        </h2>
+        <p class="text-stone-600 leading-relaxed">
+          Проект легко адаптируется под разные площадки и технические возможности. Вы можете выбрать любой удобный для вашего учреждения способ проведения:
+        </p>
+        <div class="grid sm:grid-cols-2 gap-4 pt-2">
+          <div class="bg-bgWarm p-5 rounded-lg border border-stone-200">
+            <span class="bg-brandRed text-white text-xs font-bold uppercase px-2.5 py-1 rounded">Вариант 1 • По закупке</span>
+            <h4 class="font-heading text-xl uppercase font-bold mt-3">Через «Электронный магазин» СПб (44-ФЗ / 223-ФЗ)</h4>
+            <p class="text-sm text-stone-600 mt-2">
+              Все три программы опубликованы в каталоге ГИС «Электронный магазин». Высылаем прямые ссылки на позиции, КП и полный пакет документов по ЭДО.
+            </p>
+          </div>
+          <div class="bg-bgWarm p-5 rounded-lg border border-stone-200">
+            <span class="bg-inkDark text-white text-xs font-bold uppercase px-2.5 py-1 rounded">Вариант 2 • По билетам</span>
+            <h4 class="font-heading text-xl uppercase font-bold mt-3">Выездной показ по билетам без затрат бюджета</h4>
+            <p class="text-sm text-stone-600 mt-2">
+              Приезжаем со своим оборудованием в ваш актовый зал. Оплата по официальным электронным билетам — детям не нужно никуда ехать на автобусах.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Карточка реквизитов поставщика -->
+      <div class="md:col-span-5 bg-bgWarm rounded-xl border border-stone-300 p-8 space-y-4 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-widest text-brandRed block">Карточка поставщика</span>
+        <h3 class="font-heading text-2xl uppercase font-bold text-inkDark">ИП Пасечник Николай Викторович</h3>
+        <div class="bg-white p-5 rounded-lg border border-stone-200 text-sm text-stone-700 space-y-2 font-mono">
+          <p><strong>ИНН:</strong> 772169697720</p>
+          <p><strong>ОГРНИП:</strong> 326774600494865</p>
+          <p><strong>ЭДО / ГИС СПб:</strong> Подключен</p>
+          <p><strong>Тел.:</strong> +7 (995) 005-68-20</p>
+          <p><strong>E-mail:</strong> ko1nc1@gmail.com</p>
+        </div>
+        <button onclick="openModal('Запрос КП и ссылки на Электронный магазин')" class="w-full bg-inkDark hover:bg-brandRed text-white font-heading uppercase tracking-wider py-3.5 rounded-sm transition">
+          Запросить КП для бухгалтерии
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок с видеороликом из ВК Видео (работает в РФ без VPN) -->
+  <section id="video" class="py-16 sm:py-20 bg-bgWarm border-b border-stone-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-8 text-center">
+      <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold mb-4">Фрагменты наших выступлений</h2>
+      <p class="text-stone-600 max-w-2xl mx-auto mb-8 text-sm sm:text-base">
+        Живая актёрская энергия, вовлечение зала с первой минуты и уважение к слову Маяковского.
+      </p>
+
+      <div class="aspect-video bg-black rounded-xl overflow-hidden shadow-xl border border-stone-300 relative">
+        <iframe 
+          src="https://vk.ru/video_ext.php?oid=3336363&id=456239445&autoplay=0" 
+          class="w-full h-full border-0"
+          style="background-color: #000" 
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок: 8 Благодарственных писем -->
+  <section id="reviews" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-8">
+    <div class="mb-10">
+      <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold text-inkDark">Благодарственные письма и отзывы</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc1" src="doc1.jpg" referrerpolicy="no-referrer" alt="Благодарность 1" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc2" src="doc2.jpg" referrerpolicy="no-referrer" alt="Благодарность 2" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc3" src="doc3.jpg" referrerpolicy="no-referrer" alt="Благодарность 3" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc4" src="doc4.jpg" referrerpolicy="no-referrer" alt="Благодарность 4" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc5" src="doc5.jpg" referrerpolicy="no-referrer" alt="Благодарность 5" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc6" src="doc6.jpg" referrerpolicy="no-referrer" alt="Благодарность 6" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc7" src="doc7.jpg" referrerpolicy="no-referrer" alt="Благодарность 7" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
+        <img id="img-doc8" src="doc8.jpg" referrerpolicy="no-referrer" alt="Благодарность 8" class="w-full aspect-[1/1.38] object-cover object-center">
+      </div>
+    </div>
+  </section>
+
+  <!-- Лайтбокс для просмотра благодарностей крупным планом -->
+  <div id="lightbox" onclick="this.classList.add('hidden')" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out">
+    <img id="lightboxImg" src="" referrerpolicy="no-referrer" alt="Просмотр документа" class="max-h-[92vh] max-w-[92vw] rounded-lg shadow-2xl object-contain">
+  </div>
+
+  <!-- Подвал сайта -->
+  <footer class="bg-inkDark text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div>
+        <p class="font-heading text-2xl uppercase font-bold">Николай Пасечник</p>
+        <p class="text-stone-300 text-sm mt-1">Артист, режиссёр и театральный продюсер • Санкт-Петербург / Москва</p>
+        <p class="text-stone-400 text-xs mt-2 font-mono">ИП Пасечник Н. В. • ИНН 772169697720 • ОГРНИП 326774600494865 • Тел.: +7 (995) 005-68-20</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a href="https://vk.ru/ko1yan" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
+          Страница ВКонтакте
+        </a>
+        <button onclick="openModal('Связь с продюсером')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 text-sm rounded-sm transition">
+          Оставить заявку
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Модальное окно заявки -->
+  <div id="modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl border-2 border-brandRed max-w-md w-full p-6 sm:p-8 relative shadow-2xl">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-inkDark text-2xl leading-none">&times;</button>
+      <span class="text-xs uppercase tracking-widest text-brandRed font-bold">Организация показов и гастролей</span>
+      <h3 class="font-heading text-3xl uppercase font-bold mt-1 mb-4 text-inkDark">Оставить заявку</h3>
+      
+      <form id="bookingForm" name="booking" method="POST" data-netlify="true" onsubmit="submitForm(event)" class="space-y-4">
+        <input type="hidden" name="form-name" value="booking">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Интересующая программа</label>
+          <input type="text" name="program" id="programInput" readonly class="w-full bg-stone-100 border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark font-semibold">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Ваше имя и учреждение (Школа / ДК / Театр)</label>
+          <input type="text" name="organization" id="nameInput" required placeholder="Например: Елена, Гимназия № 24" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Ваш телефон или E-mail для связи</label>
+          <input type="text" name="contact" id="phoneInput" required placeholder="+7 (999) 000-00-00" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
+        </div>
+        <button type="submit" id="submitBtn" class="w-full bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider py-3.5 text-lg rounded-sm shadow transition">
+          Отправить заявку
+        </button>
+      </form>
+
+      <!-- Сообщение об успешной отправке -->
+      <div id="successMsg" class="hidden text-center py-6 space-y-3">
+        <div class="w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+        <h4 class="font-heading text-2xl uppercase font-bold text-inkDark">Заявка принята!</h4>
+        <p class="text-sm text-stone-600">Николай свяжется с вами в ближайшее время.</p>
+      </div>
+
+      <!-- Прямые кнопки для мгновенной связи -->
+      <div class="mt-5 pt-4 border-t border-stone-200 text-center space-y-2">
+        <p class="text-xs text-stone-500">Или напишите напрямую удобным способом:</p>
+        <div class="flex justify-center gap-3 text-xs font-semibold">
+          <a href="https://vk.ru/ko1yan" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
+            Написать ВКонтакте
+          </a>
+          <a href="mailto:ko1nc1@gmail.com" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
+            ko1nc1@gmail.com
+          </a>
+          <a href="tel:+79950056820" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
+            +7 (995) 005-68-20
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // ССЫЛКИ НА КАРТИНКИ ИЗ ВКОНТАКТЕ (вставьте сюда ссылки vkuserphoto.ru):
+    // =========================================================================
+    const PHOTOS = {
+      hero: 'https://sun9-85.vkuserphoto.ru/s/v1/ig2/3TdZG54QnqcccfgUqTTEDKV2ydJOGXU2Ed1j-4UHq0T4eaeU1zJrYMMn9KR84y21pLKvcOt5qoOlQRcSVH6v8YDl.jpg?quality=95&as=32x44,48x65,72x98,108x147,160x218,240x327,360x491,480x654,540x736,640x872,720x981,1080x1472,1280x1744,1440x1962,1585x2160&from=bu&u=UQP7vyGwR1_46Mo7yYpKj7lMdG-uPWM8f1aRTjX_EWQ&cs=1585x0',
+      kids: 'kids.jpg',
+      style: 'style.jpg',
+      boat: 'boat.jpg',
+      doc1: 'doc1.jpg',
+      doc2: 'doc2.jpg',
+      doc3: 'doc3.jpg',
+      doc4: 'doc4.jpg',
+      doc5: 'doc5.jpg',
+      doc6: 'doc6.jpg',
+      doc7: 'doc7.jpg',
+      doc8: 'doc8.jpg'
+    };
+
+    // Автоматически подставляем ссылки из списка выше:
+    Object.keys(PHOTOS).forEach(key => {
+      const el = document.getElementById('img-' + key);
+      if (el && PHOTOS[key]) el.src = PHOTOS[key];
+    });
+
+    // =========================================================================
+    // НАСТРОЙКИ TELEGRAM-БОТА:
+    // =========================================================================
+    const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
+    // Если знаете свой цифровой ID в Telegram, можно вписать сюда, иначе он определится сам после вашего сообщения боту:
+    const TG_CHAT_ID = '';
+
+    function openImage(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.remove('hidden');
+    }
+
+    function openModal(programName) {
+      document.getElementById('programInput').value = programName;
+      document.getElementById('bookingForm').classList.remove('hidden');
+      document.getElementById('successMsg').classList.add('hidden');
+      document.getElementById('submitBtn').innerText = 'Отправить заявку';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    async function callTgApi(method, params = '') {
+      const directUrl = `https://api.telegram.org/bot${TG_BOT_TOKEN}/${method}${params}`;
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`;
+      try {
+        const res = await fetch(directUrl);
+        if (res.ok) return await res.json();
+      } catch (e) {}
+      try {
+        const resProxy = await fetch(proxyUrl);
+        if (resProxy.ok) return await resProxy.json();
+      } catch (e) {}
+      return null;
+    }
+
+    async function sendToTelegram(text) {
+      if (!TG_BOT_TOKEN) return;
+      try {
+        let chatId = TG_CHAT_ID || localStorage.getItem('vvma_tg_chat_id');
+        if (!chatId) {
+          const data = await callTgApi('getUpdates');
+          if (data && data.result && data.result.length > 0) {
+            for (let i = data.result.length - 1; i >= 0; i--) {
+              const upd = data.result[i];
+              const foundId = (upd.message && upd.message.chat && upd.message.chat.id) || 
+                              (upd.my_chat_member && upd.my_chat_member.chat && upd.my_chat_member.chat.id);
+              if (foundId) {
+                chatId = foundId;
+                localStorage.setItem('vvma_tg_chat_id', chatId);
+                break;
+              }
+            }
+          }
+        }
+        if (chatId) {
+          const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
+          await callTgApi('sendMessage', query);
+        }
+      } catch (e) {}
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = 'Отправка...';
+      btn.disabled = true;
+
+      const program = document.getElementById('programInput').value;
+      const name = document.getElementById('nameInput').value;
+      const phone = document.getElementById('phoneInput').value;
+
+      const tgMessage = `🎭 Новая заявка с сайта vvma.ru!\n\n📌 Программа: ${program}\n👤 Имя и площадка: ${name}\n📞 Контакт: ${phone}`;
+
+      const form = document.getElementById('bookingForm');
+      const formData = new FormData(form);
+
+      let completed = false;
+      const finishSubmission = () => {
+        if (completed) return;
+        completed = true;
+        form.classList.add('hidden');
+        document.getElementById('successMsg').classList.remove('hidden');
+      };
+
+      const timer = setTimeout(finishSubmission, 1200);
+
+      Promise.allSettled([
+        sendToTelegram(tgMessage),
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        })
+      ]).then(() => {
+        clearTimeout(timer);
+        finishSubmission();
+      });
+    }
+  </script>
+</body>
+</html>
