@@ -596,11 +596,47 @@
       document.getElementById('modal').classList.add('hidden');
     }
 
-    function fetchWithTimeout(url, options = {}, timeoutMs = 3500) {
+    // Если хотите 100% независимый шлюз в Google Cloud (который никогда не блокируется в РФ),
+    // можно вставить сюда ссылку на ваш Google Apps Script Web App (инструкция в чате):
+    const GOOGLE_SCRIPT_URL = '';
+
+    function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       return fetch(url, { ...options, signal: controller.signal })
         .finally(() => clearTimeout(id));
+    }
+
+    // Резервная отправка через фоновый JSONP/Script-тег (обходит CORS и расширения типа AdBlock)
+    function fireJsonpGateway(fullGetUrl) {
+      return new Promise(resolve => {
+        try {
+          const cbName = 'tg_cb_' + Math.floor(Math.random() * 1000000);
+          const script = document.createElement('script');
+          const timer = setTimeout(() => {
+            cleanup();
+            resolve(false);
+          }, 4500);
+          function cleanup() {
+            clearTimeout(timer);
+            try { delete window[cbName]; } catch (e) {}
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+          window[cbName] = function(data) {
+            cleanup();
+            if (data && data.contents && data.contents.indexOf('"ok":true') !== -1) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          };
+          script.src = `https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&callback=${cbName}&_=${Date.now()}`;
+          script.onerror = function() { cleanup(); resolve(false); };
+          document.body.appendChild(script);
+        } catch (e) {
+          resolve(false);
+        }
+      });
     }
 
     async function sendToTelegram(text) {
@@ -610,40 +646,54 @@
       const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
       const fullGetUrl = `${baseApi}${query}`;
 
-      // Сначала пробуем самый стабильный из РФ шлюз (CodeTabs), и если за 1.8 сек нет ответа — бьём из всех остальных:
+      // 0. Если указан персональный Google Cloud шлюз (script.google.com) — бьём через него в первую очередь
+      if (GOOGLE_SCRIPT_URL) {
+        try {
+          await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ token: TG_BOT_TOKEN, chat_id: chatId, text: text })
+          }, 4000);
+          return true;
+        } catch (e) {}
+      }
+
+      // 1. Сначала пробуем быстрый JSON-прокси AllOrigins (не режется блокировщиками рекламы)
       try {
-        const res1 = await fetchWithTimeout(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 2500);
-        if (res1.ok) {
-          const t1 = await res1.text();
-          if (t1.includes('"ok":true')) return true;
+        const resAo = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`, { cache: 'no-store' }, 4000);
+        if (resAo.ok) {
+          const dAo = await resAo.json();
+          if (dAo && dAo.contents && dAo.contents.includes('"ok":true')) return true;
         }
       } catch (e) {}
 
+      // 2. Если fetch заблокирован расширением браузера (AdBlock / Kaspersky), пробиваем через тег <script> (JSONP)
       try {
-        const res2 = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&disableCache=true`, { cache: 'no-store' }, 3000);
-        if (res2.ok) {
-          const d2 = await res2.json();
-          if (d2 && d2.contents && d2.contents.includes('"ok":true')) return true;
-        }
+        const jsonpOk = await fireJsonpGateway(fullGetUrl);
+        if (jsonpOk) return true;
       } catch (e) {}
 
-      try {
-        const res3 = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 3000);
-        if (res3.ok) {
-          const t3 = await res3.text();
-          if (t3.includes('"ok":true')) return true;
-        }
-      } catch (e) {}
+      // 3. Дополнительные независимые международные HTTPS-ретрансляторы (на AWS / Fastly / Hetzner, не Cloudflare)
+      const fallbackGateways = [
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}`,
+        `https://thingproxy.freeboard.io/fetch/${fullGetUrl}`,
+        `https://corsproxy.org/?${encodeURIComponent(fullGetUrl)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`
+      ];
 
-      try {
-        const res4 = await fetchWithTimeout(`https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 3000);
-        if (res4.ok) {
-          const t4 = await res4.text();
-          if (t4.includes('"ok":true')) return true;
-        }
-      } catch (e) {}
+      for (const gw of fallbackGateways) {
+        try {
+          const res = await fetchWithTimeout(gw, { cache: 'no-store' }, 3500);
+          if (res.ok) {
+            const bodyText = await res.text();
+            if (bodyText && bodyText.includes('"ok":true')) return true;
+          }
+        } catch (e) {}
+      }
 
-      // Прямой запрос в самом конце (на случай VPN, если прокси недоступны)
+      // 4. Прямой запрос (для пользователей с VPN или провайдеров без блокировки api.telegram.org)
       try {
         const resDirect = await fetchWithTimeout(baseApi, {
           method: 'POST',
