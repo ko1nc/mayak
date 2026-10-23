@@ -596,6 +596,13 @@
       document.getElementById('modal').classList.add('hidden');
     }
 
+    function fetchWithTimeout(url, options = {}, timeoutMs = 3500) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(id));
+    }
+
     async function sendToTelegram(text) {
       if (!TG_BOT_TOKEN) return false;
       const chatId = (TG_CHAT_ID || getStoredChatId() || '57473050').trim();
@@ -603,43 +610,47 @@
       const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
       const fullGetUrl = `${baseApi}${query}`;
 
-      // 1. Прямой POST-запрос (работает без прокси, если нет блокировки РКН у провайдера)
+      // Сначала пробуем самый стабильный из РФ шлюз (CodeTabs), и если за 1.8 сек нет ответа — бьём из всех остальных:
       try {
-        const res = await fetch(baseApi, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ chat_id: chatId, text: text }).toString()
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.ok) return true;
+        const res1 = await fetchWithTimeout(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 2500);
+        if (res1.ok) {
+          const t1 = await res1.text();
+          if (t1.includes('"ok":true')) return true;
         }
       } catch (e) {}
 
-      // 2. Запросы через цепочку зарубежных HTTPS-прокси (обходят блокировку api.telegram.org в РФ)
-      const proxyUrls = [
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`,
-        `https://thingproxy.freeboard.io/fetch/${fullGetUrl}`
-      ];
-
-      for (const pUrl of proxyUrls) {
-        try {
-          const res = await fetch(pUrl, { cache: 'no-store' });
-          if (res.ok) {
-            const textResp = await res.text();
-            if (textResp.includes('"ok":true')) return true;
-          }
-        } catch (e) {}
-      }
-
-      // 3. Резервная отправка no-cors + Image-маячок на случай жёстких политик браузера
       try {
-        fetch(fullGetUrl, { mode: 'no-cors' }).catch(() => {});
-        const img = new Image();
-        img.referrerPolicy = 'no-referrer';
-        img.src = fullGetUrl;
+        const res2 = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&disableCache=true`, { cache: 'no-store' }, 3000);
+        if (res2.ok) {
+          const d2 = await res2.json();
+          if (d2 && d2.contents && d2.contents.includes('"ok":true')) return true;
+        }
+      } catch (e) {}
+
+      try {
+        const res3 = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 3000);
+        if (res3.ok) {
+          const t3 = await res3.text();
+          if (t3.includes('"ok":true')) return true;
+        }
+      } catch (e) {}
+
+      try {
+        const res4 = await fetchWithTimeout(`https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`, { cache: 'no-store' }, 3000);
+        if (res4.ok) {
+          const t4 = await res4.text();
+          if (t4.includes('"ok":true')) return true;
+        }
+      } catch (e) {}
+
+      // Прямой запрос в самом конце (на случай VPN, если прокси недоступны)
+      try {
+        const resDirect = await fetchWithTimeout(baseApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ chat_id: chatId, text: text }).toString()
+        }, 3000);
+        if (resDirect.ok) return true;
       } catch (e) {}
 
       return false;
@@ -691,16 +702,11 @@
         document.getElementById('successMsg').classList.remove('hidden');
       };
 
-      const timer = setTimeout(finishSubmission, 2200);
+      const timer = setTimeout(finishSubmission, 3500);
 
       Promise.allSettled([
         sendToTelegram(tgMessage),
-        sendBackupEmail(program, name, phone),
-        fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(formData).toString()
-        })
+        sendBackupEmail(program, name, phone)
       ]).then(() => {
         clearTimeout(timer);
         finishSubmission();
