@@ -70,6 +70,19 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     }
   </style>
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113768228', 'ym');
+
+    ym(113768228, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/113768228" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+  <!-- /Yandex.Metrika counter -->
 </head>
 <body id="top" class="bg-bgWarm text-inkDark font-sans antialiased selection:bg-brandRed selection:text-white">
 
@@ -144,7 +157,7 @@
             <span class="text-xs uppercase tracking-wider text-amber-800 font-bold">Ближайший спектакль • 8 ноября в 12:00</span>
             <p class="font-semibold text-sm sm:text-base text-inkDark mt-0.5">«Маяковский — детям» (5+) в ТП «АртРазБег» (ул. Савушкина, 139)</p>
           </div>
-          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" class="shrink-0 bg-inkDark hover:bg-brandRed text-white font-heading uppercase text-sm px-5 py-2.5 rounded-sm tracking-wider text-center transition">
+          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" onclick="trackGoal('buy_ticket')" class="shrink-0 bg-inkDark hover:bg-brandRed text-white font-heading uppercase text-sm px-5 py-2.5 rounded-sm tracking-wider text-center transition">
             Купить билет →
           </a>
         </div>
@@ -295,7 +308,7 @@
           <button onclick="openModal('Маяковский — детям (5+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
             Оставить заявку
           </button>
-          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-6 py-3 rounded-sm font-heading uppercase tracking-wider transition">
+          <a href="https://spb.ticketland.ru/doma-kultury/tvorcheskoe-prostranstvo-artrazbeg/mayakovskiy-detyam-1/t_20261108_1200_p_29211283/" target="_blank" rel="noopener" onclick="trackGoal('buy_ticket')" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-6 py-3 rounded-sm font-heading uppercase tracking-wider transition">
             Купить билет на 8 ноября
           </a>
         </div>
@@ -584,7 +597,16 @@
       document.getElementById('lightbox').classList.remove('hidden');
     }
 
+    function trackGoal(goalName, params) {
+      try {
+        if (typeof window.ym === 'function') {
+          window.ym(113768228, 'reachGoal', goalName, params || {});
+        }
+      } catch (err) {}
+    }
+
     function openModal(programName) {
+      trackGoal('open_modal', { program: programName });
       document.getElementById('programInput').value = programName;
       document.getElementById('bookingForm').classList.remove('hidden');
       document.getElementById('successMsg').classList.add('hidden');
@@ -749,6 +771,10 @@
       const finishSubmission = () => {
         if (completed) return;
         completed = true;
+        trackGoal('lead_submit', { program: program });
+        if (program.indexOf('КП') !== -1) {
+          trackGoal('kp_request');
+        }
         form.classList.add('hidden');
         document.getElementById('successMsg').classList.remove('hidden');
       };
