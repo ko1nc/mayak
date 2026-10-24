@@ -502,6 +502,7 @@
       
       <form id="bookingForm" name="booking" method="POST" data-netlify="true" onsubmit="submitForm(event)" class="space-y-4">
         <input type="hidden" name="form-name" value="booking">
+        <input type="text" name="org_website_hp" id="hpInput" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true">
         <div>
           <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Интересующая программа</label>
           <input type="text" name="program" id="programInput" readonly class="w-full bg-stone-100 border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark font-semibold">
@@ -597,8 +598,24 @@
       document.getElementById('lightbox').classList.remove('hidden');
     }
 
+    const PAGE_LOAD_TS = Date.now();
+    let isHumanInteracted = false;
+    window.addEventListener('pointermove', () => { isHumanInteracted = true; }, { once: true, passive: true });
+    window.addEventListener('touchstart', () => { isHumanInteracted = true; }, { once: true, passive: true });
+    window.addEventListener('keydown', () => { isHumanInteracted = true; }, { once: true, passive: true });
+
+    function isValidContact(contactStr) {
+      const s = (contactStr || '').trim();
+      if (s.includes('@') && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s)) return true;
+      const digits = s.replace(/\D/g, '');
+      if (digits.length < 10 || digits.length > 11) return false;
+      if (/^(\d)\1{6,}$/.test(digits)) return false;
+      return true;
+    }
+
     function trackGoal(goalName, params) {
       try {
+        if (!isHumanInteracted) return;
         if (typeof window.ym === 'function') {
           window.ym(113768228, 'reachGoal', goalName, params || {});
         }
@@ -750,13 +767,25 @@
 
     function submitForm(e) {
       e.preventDefault();
+      const hp = document.getElementById('hpInput');
+      if (hp && hp.value) return;
+      if (Date.now() - PAGE_LOAD_TS < 4000 || !isHumanInteracted) return;
+
+      const program = document.getElementById('programInput').value;
+      const name = document.getElementById('nameInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+
+      if (name.length < 2 || !isValidContact(phone)) {
+        const phoneEl = document.getElementById('phoneInput');
+        phoneEl.setCustomValidity('Укажите корректный номер телефона (10–11 цифр) или E-mail');
+        phoneEl.reportValidity();
+        phoneEl.oninput = () => phoneEl.setCustomValidity('');
+        return;
+      }
+
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'Отправка...';
       btn.disabled = true;
-
-      const program = document.getElementById('programInput').value;
-      const name = document.getElementById('nameInput').value;
-      const phone = document.getElementById('phoneInput').value;
 
       const tgMessage = `🎭 Новая заявка с сайта vvma.ru!
 
