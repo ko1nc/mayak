@@ -163,7 +163,7 @@
         </div>
       </div>
 
-      <!-- Главное фото проекта (загружается напрямую с серверов ВК) -->
+      <!-- Главное фото проекта -->
       <div class="md:col-span-5">
         <div class="bg-white p-3 rounded-xl border border-stone-200 shadow-xl">
           <div class="aspect-[4/5] rounded-lg overflow-hidden bg-stone-200 relative flex flex-col justify-end">
@@ -416,7 +416,7 @@
     </div>
   </section>
 
-  <!-- Блок с видеороликом из ВК Видео (работает в РФ без VPN) -->
+  <!-- Блок с видеороликом из ВК Видео -->
   <section id="video" class="py-16 sm:py-20 bg-bgWarm border-b border-stone-200">
     <div class="max-w-5xl mx-auto px-4 sm:px-8 text-center">
       <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold mb-4">Фрагменты наших выступлений</h2>
@@ -493,7 +493,7 @@
     </div>
   </footer>
 
-  <!-- Модальное окно заявки -->
+  <!-- Модальное окно заявки (без блокирующих проверок номера и таймеров) -->
   <div id="modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-xl border-2 border-brandRed max-w-md w-full p-6 sm:p-8 relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-inkDark text-2xl leading-none">&times;</button>
@@ -502,7 +502,6 @@
       
       <form id="bookingForm" name="booking" method="POST" data-netlify="true" onsubmit="submitForm(event)" class="space-y-4">
         <input type="hidden" name="form-name" value="booking">
-        <input type="text" name="org_website_hp" id="hpInput" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true">
         <div>
           <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Интересующая программа</label>
           <input type="text" name="program" id="programInput" readonly class="w-full bg-stone-100 border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark font-semibold">
@@ -513,7 +512,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Ваш телефон или E-mail для связи</label>
-          <input type="text" name="contact" id="phoneInput" required placeholder="+7 (999) 000-00-00" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
+          <input type="text" name="contact" id="phoneInput" required placeholder="+7 (999) 000-00-00 или e-mail" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
         </div>
         <button type="submit" id="submitBtn" class="w-full bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider py-3.5 text-lg rounded-sm shadow transition">
           Отправить заявку
@@ -546,9 +545,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // ССЫЛКИ НА КАРТИНКИ ИЗ ВКОНТАКТЕ (вставьте сюда ссылки vkuserphoto.ru):
-    // =========================================================================
     const PHOTOS = {
       hero: 'https://sun9-85.vkuserphoto.ru/s/v1/ig2/3TdZG54QnqcccfgUqTTEDKV2ydJOGXU2Ed1j-4UHq0T4eaeU1zJrYMMn9KR84y21pLKvcOt5qoOlQRcSVH6v8YDl.jpg?quality=95&as=32x44,48x65,72x98,108x147,160x218,240x327,360x491,480x654,540x736,640x872,720x981,1080x1472,1280x1744,1440x1962,1585x2160&from=bu&u=UQP7vyGwR1_46Mo7yYpKj7lMdG-uPWM8f1aRTjX_EWQ&cs=1585x0',
       kids: 'https://psv4.vkuserphoto.ru/s/v1/d2/OitWBeHCszzKfPe0nL3hZwKeo65ZUJq7WgY615nIFaVU-kNJosK0gzXHc6JfHkq94I1fi2mFsochjz1L6Za8VmKLSijGgXGm-_lrTz3_Nx0fKpVoWWPbP2XbYYXb9RUgm9o4FrAvNDtI/kids.jpg',
@@ -564,58 +560,23 @@
       doc8: 'https://psv4.vkuserphoto.ru/s/v1/d2/30_1Ae3qO1eCTDpLrJQGeI77LandHPHEZAXIYqUEo4gGJutxkqkmkNkr0CcvUVsloEufFqi2Uh9_WQScuLkypFSFpGeK2DJtDn6_E1d6akacIL-pdQIcRCSK1suLtI5KSbvm55XzLD-V/doc8.jpg'
     };
 
-    // Автоматически подставляем ссылки из списка выше:
     Object.keys(PHOTOS).forEach(key => {
       const el = document.getElementById('img-' + key);
       if (el && PHOTOS[key]) el.src = PHOTOS[key];
     });
 
-    // =========================================================================
-    // НАСТРОЙКИ TELEGRAM-БОТА И ПОЧТЫ:
-    // ВАЖНО: Впишите ваш цифровой Chat ID в кавычки ниже (узнать его можно,
-    // написав любое сообщение боту @userinfobot в Telegram, например: '123456789').
-    // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
     const BACKUP_EMAIL = 'ko1nc1@gmail.com';
-
-    function getStoredChatId() {
-      try {
-        return localStorage.getItem('vvma_tg_chat_id') || '';
-      } catch (e) {
-        return '';
-      }
-    }
-
-    function setStoredChatId(val) {
-      try {
-        localStorage.setItem('vvma_tg_chat_id', String(val));
-      } catch (e) {}
-    }
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXfO06h9vxHpOqKYyN052SznTGD-yHFBgbHqOQwXnDfPhlanudACTrhmA87fbBQlma/exec';
 
     function openImage(src) {
       document.getElementById('lightboxImg').src = src;
       document.getElementById('lightbox').classList.remove('hidden');
     }
 
-    const PAGE_LOAD_TS = Date.now();
-    let isHumanInteracted = false;
-    window.addEventListener('pointermove', () => { isHumanInteracted = true; }, { once: true, passive: true });
-    window.addEventListener('touchstart', () => { isHumanInteracted = true; }, { once: true, passive: true });
-    window.addEventListener('keydown', () => { isHumanInteracted = true; }, { once: true, passive: true });
-
-    function isValidContact(contactStr) {
-      const s = (contactStr || '').trim();
-      if (s.includes('@') && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s)) return true;
-      const digits = s.replace(/\D/g, '');
-      if (digits.length < 10 || digits.length > 11) return false;
-      if (/^(\d)\1{6,}$/.test(digits)) return false;
-      return true;
-    }
-
     function trackGoal(goalName, params) {
       try {
-        if (!isHumanInteracted) return;
         if (typeof window.ym === 'function') {
           window.ym(113768228, 'reachGoal', goalName, params || {});
         }
@@ -636,10 +597,6 @@
       document.getElementById('modal').classList.add('hidden');
     }
 
-    // Если хотите 100% независимый шлюз в Google Cloud (который никогда не блокируется в РФ),
-    // можно вставить сюда ссылку на ваш Google Apps Script Web App (инструкция в чате):
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxXYwLFBBKWfgMH2feofMwc_PPxDp4vRJqpQeMHojueovFvacCKg7EbZbaE-kndrJBow/exec';
-
     function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -647,7 +604,6 @@
         .finally(() => clearTimeout(id));
     }
 
-    // Резервная отправка через фоновый JSONP/Script-тег (обходит CORS и расширения типа AdBlock)
     function fireJsonpGateway(fullGetUrl) {
       return new Promise(resolve => {
         try {
@@ -681,12 +637,12 @@
 
     async function sendToTelegram(text) {
       if (!TG_BOT_TOKEN) return false;
-      const chatId = (TG_CHAT_ID || getStoredChatId() || '57473050').trim();
+      const chatId = TG_CHAT_ID.trim();
       const baseApi = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
       const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
       const fullGetUrl = `${baseApi}${query}`;
 
-      // 0. Если указан персональный Google Cloud шлюз (script.google.com) — бьём через него в первую очередь
+      // 0. Персональный Google Cloud шлюз (script.google.com) — бьём через него в первую очередь
       if (GOOGLE_SCRIPT_URL) {
         try {
           await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
@@ -699,7 +655,7 @@
         } catch (e) {}
       }
 
-      // 1. Сначала пробуем быстрый JSON-прокси AllOrigins (не режется блокировщиками рекламы)
+      // 1. Быстрый JSON-прокси AllOrigins
       try {
         const resAo = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`, { cache: 'no-store' }, 4000);
         if (resAo.ok) {
@@ -708,13 +664,13 @@
         }
       } catch (e) {}
 
-      // 2. Если fetch заблокирован расширением браузера (AdBlock / Kaspersky), пробиваем через тег <script> (JSONP)
+      // 2. JSONP через тег <script>
       try {
         const jsonpOk = await fireJsonpGateway(fullGetUrl);
         if (jsonpOk) return true;
       } catch (e) {}
 
-      // 3. Дополнительные независимые международные HTTPS-ретрансляторы (на AWS / Fastly / Hetzner, не Cloudflare)
+      // 3. Дополнительные прокси-ретрансляторы
       const fallbackGateways = [
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}`,
@@ -733,7 +689,7 @@
         } catch (e) {}
       }
 
-      // 4. Прямой запрос (для пользователей с VPN или провайдеров без блокировки api.telegram.org)
+      // 4. Прямой запрос
       try {
         const resDirect = await fetchWithTimeout(baseApi, {
           method: 'POST',
@@ -767,34 +723,18 @@
 
     function submitForm(e) {
       e.preventDefault();
-      const hp = document.getElementById('hpInput');
-      if (hp && hp.value) return;
-      if (Date.now() - PAGE_LOAD_TS < 4000 || !isHumanInteracted) return;
 
       const program = document.getElementById('programInput').value;
       const name = document.getElementById('nameInput').value.trim();
       const phone = document.getElementById('phoneInput').value.trim();
 
-      if (name.length < 2 || !isValidContact(phone)) {
-        const phoneEl = document.getElementById('phoneInput');
-        phoneEl.setCustomValidity('Укажите корректный номер телефона (10–11 цифр) или E-mail');
-        phoneEl.reportValidity();
-        phoneEl.oninput = () => phoneEl.setCustomValidity('');
-        return;
-      }
-
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'Отправка...';
       btn.disabled = true;
 
-      const tgMessage = `🎭 Новая заявка с сайта vvma.ru!
-
-📌 Программа: ${program}
-👤 Имя и площадка: ${name}
-📞 Контакт: ${phone}`;
+      const tgMessage = `🎭 Новая заявка с сайта vvma.ru!\n\n📌 Программа: ${program}\n👤 Имя и площадка: ${name}\n📞 Контакт: ${phone}`;
 
       const form = document.getElementById('bookingForm');
-      const formData = new FormData(form);
 
       let completed = false;
       const finishSubmission = () => {
