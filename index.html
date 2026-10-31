@@ -493,7 +493,7 @@
     <img id="lightboxImg" src="" referrerpolicy="no-referrer" alt="Просмотр документа" class="max-h-[92vh] max-w-[92vw] rounded-lg shadow-2xl object-contain">
   </div>
 
-  <!-- Подвал сайта (с личным ВК и личным MAX +79950056820) -->
+  <!-- Подвал сайта -->
   <footer class="bg-inkDark text-white py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div>
@@ -514,9 +514,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Скрытый транспортный iframe для фоновой отправки почты -->
-  <iframe name="tg_hidden_transport" id="tg_hidden_transport" style="display:none;width:0;height:0;border:0;"></iframe>
 
   <!-- Модальное окно заявки -->
   <div id="modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -593,7 +590,6 @@
       if (el && PHOTOS[key]) el.src = PHOTOS[key];
     });
 
-    // Если скопируете личную ссылку профиля из настроек MAX (вида https://max.ru/u/...), вставьте её сюда:
     const PERSONAL_MAX_LINK = 'https://web.max.ru/';
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -613,11 +609,12 @@
     }
 
     // =========================================================================
-    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА + БОТ MAX («Заявки с сайтов»)
+    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
     const BACKUP_EMAIL = 'ko1nc1@gmail.com';
+    const FORMSUBMIT_TOKEN = '308947d6baa3b1a2000c7e9a47ca7edd';
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvr3-YQCb6mudHDTdYH7broiyzAkEcM1CjnS1abb2YdtKCUXqHjEeZ2Eh9vrtY_j0GiQ/exec';
     const MAX_BOT_TOKEN = 'f9LHodD0cOLGeaYy8TzD_3zw8aVzz6WsY9Naa8PpMCCxyju4prOgVIawjMhnxSV63RgHPpZLGhNXn0navnj8';
 
@@ -703,35 +700,44 @@
       });
     }
 
-    // 1. Отправка через Google Cloud шлюз (доставляет в ТГ и бот MAX)
+    // 1. Безотказная отправка через Google Cloud шлюз (доставляет в ТГ, на почту от ko1nc1@gmail.com и в бот MAX)
     async function sendViaGoogleScript(text, program, name, contact) {
       if (!GOOGLE_SCRIPT_URL) return false;
       const chatId = TG_CHAT_ID.trim();
-      const payloadObj = {
-        token: TG_BOT_TOKEN,
-        chat_id: chatId,
-        text: text,
-        email: BACKUP_EMAIL,
-        subject: `🎭 Заявка vvma.ru: ${program}`,
-        name: name,
-        contact: contact,
-        max_token: MAX_BOT_TOKEN
-      };
-      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&max_token=${encodeURIComponent(MAX_BOT_TOKEN)}&subject=${encodeURIComponent('Заявка vvma.ru: ' + program)}&text=${encodeURIComponent(text)}`;
+      const emailSubject = `🎭 Заявка vvma.ru: ${program}`;
+      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
+
       try {
-        await fetchWithTimeout(urlWithParams, {
+        const img = new Image();
+        img.src = urlWithParams;
+      } catch (e) {}
+
+      await Promise.allSettled([
+        fetchWithTimeout(urlWithParams, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-store'
+        }, 4000),
+        fetchWithTimeout(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payloadObj)
-        }, 4000);
-        return true;
-      } catch (e) {
-        return false;
-      }
+          body: JSON.stringify({
+            token: TG_BOT_TOKEN,
+            chat_id: chatId,
+            subject: emailSubject,
+            text: text,
+            email: BACKUP_EMAIL,
+            name: name,
+            contact: contact,
+            max_token: MAX_BOT_TOKEN
+          })
+        }, 4000)
+      ]);
+      return true;
     }
 
-    // 2. Отправка в Telegram
+    // 2. Отправка в Telegram + вызов Google Cloud шлюза
     async function sendToTelegram(text, program, name, contact) {
       if (!TG_BOT_TOKEN) return false;
       const chatId = TG_CHAT_ID.trim();
@@ -739,7 +745,7 @@
       const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
       const fullGetUrl = `${baseApi}${query}`;
 
-      sendViaGoogleScript(text, program, name, contact);
+      await sendViaGoogleScript(text, program, name, contact);
 
       try {
         const resDirect = await fetchWithTimeout(baseApi, {
@@ -785,154 +791,30 @@
       return false;
     }
 
-    // 3. Отправка на почту
-    function fireNativeEmailForm(subject, program, name, contact) {
-      try {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `https://formsubmit.co/${BACKUP_EMAIL}`;
-        form.target = 'tg_hidden_transport';
-        form.style.display = 'none';
-
-        const fields = {
-          _subject: subject,
-          _captcha: 'false',
-          _template: 'table',
-          Сайт: 'vvma.ru',
-          Программа: program,
-          Организация_и_Имя: name,
-          Контакт: contact
-        };
-
-        Object.keys(fields).forEach(k => {
-          const inp = document.createElement('input');
-          inp.type = 'hidden';
-          inp.name = k;
-          inp.value = fields[k];
-          form.appendChild(inp);
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-        setTimeout(() => {
-          if (form.parentNode) form.parentNode.removeChild(form);
-        }, 3000);
-      } catch (e) {}
-    }
-
+    // 3. Дополнительная отправка на почту по вашему токену FormSubmit (308947d6baa3b1a2000c7e9a47ca7edd)
     async function sendBackupEmail(program, name, contact) {
-      if (!BACKUP_EMAIL) return;
       const subj = `🎭 Заявка с сайта vvma.ru: ${program}`;
-      fireNativeEmailForm(subj, program, name, contact);
-      try {
-        await fetchWithTimeout(`https://formsubmit.co/ajax/${BACKUP_EMAIL}`, {
+      const payload = JSON.stringify({
+        _subject: subj,
+        _captcha: 'false',
+        Программа: program,
+        Организация_и_Имя: name,
+        Контакт: contact,
+        _template: 'table'
+      });
+
+      await Promise.allSettled([
+        fetchWithTimeout(`https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            _subject: subj,
-            _captcha: 'false',
-            Программа: program,
-            Организация_и_Имя: name,
-            Контакт: contact,
-            _template: 'table'
-          })
-        }, 4500);
-      } catch (e) {}
-    }
-
-    // 4. Резервная отправка в бот MAX («Заявки с сайтов») через прокси-шлюзы
-    async function fetchMaxJson(apiUrl) {
-      const candidates = [
-        `https://thingproxy.freeboard.io/fetch/${apiUrl}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}&_=${Date.now()}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`
-      ];
-      for (const u of candidates) {
-        try {
-          const r = await fetchWithTimeout(u, { cache: 'no-store' }, 3000);
-          if (r.ok) {
-            const j = await r.json();
-            if (j) return j;
-          }
-        } catch (e) {}
-      }
-      return null;
-    }
-
-    async function discoverMaxTargets() {
-      const chatIds = new Set();
-      const userIds = new Set();
-
-      const [chats1, updates1, chats2, updates2] = await Promise.all([
-        fetchMaxJson(`https://platform-api.max.ru/chats?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
-        fetchMaxJson(`https://platform-api.max.ru/updates?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
-        fetchMaxJson(`https://botapi.max.ru/chats?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
-        fetchMaxJson(`https://botapi.max.ru/updates?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`)
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: payload
+        }, 4000),
+        fetchWithTimeout(`https://formsubmit.co/ajax/${BACKUP_EMAIL}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: payload
+        }, 4000)
       ]);
-
-      [chats1, chats2].forEach(chatsData => {
-        if (chatsData && Array.isArray(chatsData.chats)) {
-          chatsData.chats.forEach(c => {
-            if (c && c.chat_id) chatIds.add(String(c.chat_id));
-          });
-        }
-      });
-
-      [updates1, updates2].forEach(updatesData => {
-        if (updatesData && Array.isArray(updatesData.updates)) {
-          updatesData.updates.forEach(u => {
-            if (u.chat_id) chatIds.add(String(u.chat_id));
-            if (u.user_id) userIds.add(String(u.user_id));
-            if (u.user && u.user.user_id) userIds.add(String(u.user.user_id));
-            if (u.message) {
-              if (u.message.recipient && u.message.recipient.chat_id) chatIds.add(String(u.message.recipient.chat_id));
-              if (u.message.sender && u.message.sender.user_id) userIds.add(String(u.message.sender.user_id));
-            }
-          });
-        }
-      });
-
-      return { chatIds: Array.from(chatIds), userIds: Array.from(userIds) };
-    }
-
-    async function postMaxMessage(targetParam, text) {
-      const bodyStr = JSON.stringify({ text: text });
-      const endpoints = [
-        `https://platform-api.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`,
-        `https://botapi.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`
-      ];
-      const tasks = [];
-      endpoints.forEach(ep => {
-        tasks.push(fetchWithTimeout(`https://thingproxy.freeboard.io/fetch/${ep}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': MAX_BOT_TOKEN },
-          body: bodyStr
-        }, 3500));
-        tasks.push(fetchWithTimeout(`https://corsproxy.io/?url=${encodeURIComponent(ep)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': MAX_BOT_TOKEN },
-          body: bodyStr
-        }, 3500));
-      });
-      await Promise.allSettled(tasks);
-    }
-
-    async function sendToMax(text) {
-      if (!MAX_BOT_TOKEN) return false;
-      try {
-        const targets = await discoverMaxTargets();
-        const tasks = [];
-        targets.chatIds.forEach(cid => tasks.push(postMaxMessage(`chat_id=${encodeURIComponent(cid)}`, text)));
-        targets.userIds.forEach(uid => tasks.push(postMaxMessage(`user_id=${encodeURIComponent(uid)}`, text)));
-        await Promise.allSettled(tasks);
-        return true;
-      } catch (e) {
-        return false;
-      }
     }
 
     function submitForm(e) {
@@ -976,8 +858,7 @@
 
       Promise.allSettled([
         sendToTelegram(tgMessage, program, name, phone),
-        sendBackupEmail(program, name, phone),
-        sendToMax(tgMessage)
+        sendBackupEmail(program, name, phone)
       ]).then(() => {
         clearTimeout(timer);
         finishSubmission();
