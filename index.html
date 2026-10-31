@@ -551,7 +551,7 @@
         <p class="text-sm text-stone-600">Николай свяжется с вами в ближайшее время.</p>
       </div>
 
-      <!-- Прямые кнопки для мгновенной связи (личка ВК, бот MAX, Почта, Телефон) -->
+      <!-- Прямые кнопки для мгновенной связи -->
       <div class="mt-5 pt-4 border-t border-stone-200 text-center space-y-2">
         <p class="text-xs text-stone-500">Или напишите напрямую удобным способом:</p>
         <div class="flex flex-wrap justify-center gap-2 text-xs font-semibold">
@@ -594,19 +594,13 @@
     });
 
     // =========================================================================
-    // МУЛЬТИ-КАНАЛЬНЫЕ АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА + ВК (В ЛИЧКУ) + MAX
+    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА + МЕССЕНДЖЕР MAX (@id772169697720_bot)
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
     const BACKUP_EMAIL = 'ko1nc1@gmail.com';
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvr3-YQCb6mudHDTdYH7broiyzAkEcM1CjnS1abb2YdtKCUXqHjEeZ2Eh9vrtY_j0GiQ/exec';
-
-    // Вставьте сюда ключ доступа группы ВК для автоотправки заявок вам в личку (id3336363)
-    const VK_API_TOKEN = '';
-    const VK_ADMIN_ID = '3336363';
-    // Вставьте сюда токен вашего бота MAX (@id772169697720_bot) от @MasterBot
-    const MAX_BOT_TOKEN = '';
-    const MAX_CHAT_ID = '';
+    const MAX_BOT_TOKEN = 'f9LHodD0cOLGeaYy8TzD_3zw8aVzz6WsY9Naa8PpMCCxyju4prOgVIawjMhnxSV63RgHPpZLGhNXn0navnj8';
 
     let isHumanInteracted = false;
     let isModalOpened = false;
@@ -702,12 +696,9 @@
         subject: `🎭 Заявка vvma.ru: ${program}`,
         name: name,
         contact: contact,
-        vk_token: VK_API_TOKEN,
-        vk_user_id: VK_ADMIN_ID,
-        max_token: MAX_BOT_TOKEN,
-        max_chat_id: MAX_CHAT_ID
+        max_token: MAX_BOT_TOKEN
       };
-      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent('Заявка vvma.ru: ' + program)}&text=${encodeURIComponent(text)}`;
+      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&max_token=${encodeURIComponent(MAX_BOT_TOKEN)}&subject=${encodeURIComponent('Заявка vvma.ru: ' + program)}&text=${encodeURIComponent(text)}`;
       try {
         await fetchWithTimeout(urlWithParams, {
           method: 'POST',
@@ -721,7 +712,7 @@
       }
     }
 
-    // 2. Независимая отправка в Telegram
+    // 2. Отправка в Telegram
     async function sendToTelegram(text, program, name, contact) {
       if (!TG_BOT_TOKEN) return false;
       const chatId = TG_CHAT_ID.trim();
@@ -775,7 +766,7 @@
       return false;
     }
 
-    // 3. Гарантированная отправка на почту (нативный HTML POST в скрытый iframe + AJAX дубль)
+    // 3. Отправка на почту (нативный HTML POST в скрытый iframe + AJAX дубль)
     function fireNativeEmailForm(subject, program, name, contact) {
       try {
         const form = document.createElement('form');
@@ -833,40 +824,105 @@
       } catch (e) {}
     }
 
-    // 4. Автоотправка в личные сообщения ВКонтакте (на ваш id3336363)
-    function sendToVK(text) {
-      return new Promise(resolve => {
-        if (!VK_API_TOKEN || !VK_ADMIN_ID) return resolve(false);
+    // 4. Автоотправка в мессенджер MAX (@id772169697720_bot)
+    async function fetchMaxJson(apiUrl) {
+      const candidates = [
+        apiUrl,
+        `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}&_=${Date.now()}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`
+      ];
+      for (const u of candidates) {
         try {
-          const cbName = 'vk_cb_' + Math.floor(Math.random() * 1000000);
-          const script = document.createElement('script');
-          const timer = setTimeout(() => { cleanup(); resolve(false); }, 3500);
-          function cleanup() {
-            clearTimeout(timer);
-            try { delete window[cbName]; } catch (e) {}
-            if (script.parentNode) script.parentNode.removeChild(script);
+          const r = await fetchWithTimeout(u, { cache: 'no-store' }, 3000);
+          if (r.ok) {
+            const j = await r.json();
+            if (j) return j;
           }
-          window[cbName] = function() { cleanup(); resolve(true); };
-          script.src = `https://api.vk.com/method/messages.send?user_id=${encodeURIComponent(VK_ADMIN_ID)}&random_id=${Date.now()}&message=${encodeURIComponent(text)}&access_token=${encodeURIComponent(VK_API_TOKEN)}&v=5.199&callback=${cbName}`;
-          script.onerror = function() { cleanup(); resolve(false); };
-          document.body.appendChild(script);
-        } catch (e) {
-          resolve(false);
-        }
-      });
+        } catch (e) {}
+      }
+      return null;
     }
 
-    // 5. Автоотправка в мессенджер MAX (@id772169697720_bot)
-    async function sendToMax(text) {
-      if (!MAX_BOT_TOKEN || !MAX_CHAT_ID) return false;
+    async function discoverMaxTargets() {
+      const chatIds = new Set();
+      const userIds = new Set();
+
       try {
-        const maxUrl = `https://botapi.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&chat_id=${encodeURIComponent(MAX_CHAT_ID)}`;
-        await fetchWithTimeout(maxUrl, {
+        const savedChat = localStorage.getItem('max_admin_chat_id');
+        const savedUser = localStorage.getItem('max_admin_user_id');
+        if (savedChat) chatIds.add(savedChat);
+        if (savedUser) userIds.add(savedUser);
+      } catch (e) {}
+
+      const [chatsData, updatesData] = await Promise.all([
+        fetchMaxJson(`https://botapi.max.ru/chats?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
+        fetchMaxJson(`https://botapi.max.ru/updates?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`)
+      ]);
+
+      if (chatsData && Array.isArray(chatsData.chats)) {
+        chatsData.chats.forEach(c => {
+          if (c && c.chat_id) chatIds.add(String(c.chat_id));
+        });
+      }
+
+      if (updatesData && Array.isArray(updatesData.updates)) {
+        updatesData.updates.forEach(u => {
+          if (u.chat_id) chatIds.add(String(u.chat_id));
+          if (u.user_id) userIds.add(String(u.user_id));
+          if (u.user && u.user.user_id) userIds.add(String(u.user.user_id));
+          if (u.message) {
+            if (u.message.recipient && u.message.recipient.chat_id) {
+              chatIds.add(String(u.message.recipient.chat_id));
+            }
+            if (u.message.sender && u.message.sender.user_id) {
+              userIds.add(String(u.message.sender.user_id));
+            }
+          }
+        });
+      }
+
+      try {
+        const firstChat = Array.from(chatIds)[0];
+        const firstUser = Array.from(userIds)[0];
+        if (firstChat) localStorage.setItem('max_admin_chat_id', firstChat);
+        if (firstUser) localStorage.setItem('max_admin_user_id', firstUser);
+      } catch (e) {}
+
+      return { chatIds: Array.from(chatIds), userIds: Array.from(userIds) };
+    }
+
+    async function postMaxMessage(targetParam, text) {
+      const directUrl = `https://botapi.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`;
+      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(directUrl)}`;
+      const bodyStr = JSON.stringify({ text: text });
+
+      await Promise.allSettled([
+        fetchWithTimeout(directUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text })
-        }, 3500);
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: bodyStr
+        }, 3500),
+        fetchWithTimeout(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': MAX_BOT_TOKEN
+          },
+          body: bodyStr
+        }, 3500)
+      ]);
+    }
+
+    async function sendToMax(text) {
+      if (!MAX_BOT_TOKEN) return false;
+      try {
+        const targets = await discoverMaxTargets();
+        const tasks = [];
+        targets.chatIds.forEach(cid => tasks.push(postMaxMessage(`chat_id=${encodeURIComponent(cid)}`, text)));
+        targets.userIds.forEach(uid => tasks.push(postMaxMessage(`user_id=${encodeURIComponent(uid)}`, text)));
+        await Promise.allSettled(tasks);
         return true;
       } catch (e) {
         return false;
@@ -915,7 +971,6 @@
       Promise.allSettled([
         sendToTelegram(tgMessage, program, name, phone),
         sendBackupEmail(program, name, phone),
-        sendToVK(tgMessage),
         sendToMax(tgMessage)
       ]).then(() => {
         clearTimeout(timer);
