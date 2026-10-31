@@ -493,7 +493,7 @@
     <img id="lightboxImg" src="" referrerpolicy="no-referrer" alt="Просмотр документа" class="max-h-[92vh] max-w-[92vw] rounded-lg shadow-2xl object-contain">
   </div>
 
-  <!-- Подвал сайта -->
+  <!-- Подвал сайта (с личным ВК и личным MAX +79950056820) -->
   <footer class="bg-inkDark text-white py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div>
@@ -505,8 +505,8 @@
         <a href="https://vk.me/ko1yan" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
           Написать в ВК (в личку)
         </a>
-        <a href="https://max.ru/id772169697720_bot" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
-          Написать в MAX
+        <a href="https://web.max.ru/" target="_blank" rel="noopener" onclick="openPersonalMax(event)" class="personal-max-link bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
+          Написать в MAX: +7 (995) 005-68-20
         </a>
         <button onclick="openModal('Связь с продюсером')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 text-sm rounded-sm transition">
           Оставить заявку
@@ -558,16 +558,16 @@
           <a id="vkDirectBtn" href="https://vk.me/ko1yan" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
             ВКонтакте (в личку)
           </a>
-          <a id="maxDirectBtn" href="https://max.ru/id772169697720_bot" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
-            Написать в MAX
+          <a id="maxDirectBtn" href="https://web.max.ru/" target="_blank" rel="noopener" onclick="openPersonalMax(event)" class="personal-max-link bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
+            MAX: +7 (995) 005-68-20
           </a>
           <a id="mailDirectBtn" href="mailto:ko1nc1@gmail.com" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
             ko1nc1@gmail.com
           </a>
-          <a href="tel:+79950056820" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
-            +7 (995) 005-68-20
-          </a>
         </div>
+        <p id="maxCopyNotice" class="hidden text-xs text-brandRed font-semibold pt-1">
+          ✓ Номер +79950056820 скопирован для диалога в MAX
+        </p>
       </div>
     </div>
   </div>
@@ -593,8 +593,27 @@
       if (el && PHOTOS[key]) el.src = PHOTOS[key];
     });
 
+    // Если скопируете личную ссылку профиля из настроек MAX (вида https://max.ru/u/...), вставьте её сюда:
+    const PERSONAL_MAX_LINK = 'https://web.max.ru/';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.personal-max-link').forEach(link => {
+        link.href = PERSONAL_MAX_LINK;
+      });
+    });
+
+    function openPersonalMax(e) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText('+79950056820');
+        }
+        const notice = document.getElementById('maxCopyNotice');
+        if (notice) notice.classList.remove('hidden');
+      } catch (err) {}
+    }
+
     // =========================================================================
-    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА + МЕССЕНДЖЕР MAX (@id772169697720_bot)
+    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА + БОТ MAX («Заявки с сайтов»)
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
@@ -684,7 +703,7 @@
       });
     }
 
-    // 1. Отправка через Google Cloud шлюз
+    // 1. Отправка через Google Cloud шлюз (доставляет в ТГ и бот MAX)
     async function sendViaGoogleScript(text, program, name, contact) {
       if (!GOOGLE_SCRIPT_URL) return false;
       const chatId = TG_CHAT_ID.trim();
@@ -766,7 +785,7 @@
       return false;
     }
 
-    // 3. Отправка на почту (нативный HTML POST в скрытый iframe + AJAX дубль)
+    // 3. Отправка на почту
     function fireNativeEmailForm(subject, program, name, contact) {
       try {
         const form = document.createElement('form');
@@ -824,13 +843,13 @@
       } catch (e) {}
     }
 
-    // 4. Автоотправка в мессенджер MAX (@id772169697720_bot)
+    // 4. Резервная отправка в бот MAX («Заявки с сайтов») через прокси-шлюзы
     async function fetchMaxJson(apiUrl) {
       const candidates = [
-        apiUrl,
-        `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`,
+        `https://thingproxy.freeboard.io/fetch/${apiUrl}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}&_=${Date.now()}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`
+        `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`
       ];
       for (const u of candidates) {
         try {
@@ -848,71 +867,58 @@
       const chatIds = new Set();
       const userIds = new Set();
 
-      try {
-        const savedChat = localStorage.getItem('max_admin_chat_id');
-        const savedUser = localStorage.getItem('max_admin_user_id');
-        if (savedChat) chatIds.add(savedChat);
-        if (savedUser) userIds.add(savedUser);
-      } catch (e) {}
-
-      const [chatsData, updatesData] = await Promise.all([
+      const [chats1, updates1, chats2, updates2] = await Promise.all([
+        fetchMaxJson(`https://platform-api.max.ru/chats?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
+        fetchMaxJson(`https://platform-api.max.ru/updates?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
         fetchMaxJson(`https://botapi.max.ru/chats?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`),
         fetchMaxJson(`https://botapi.max.ru/updates?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}`)
       ]);
 
-      if (chatsData && Array.isArray(chatsData.chats)) {
-        chatsData.chats.forEach(c => {
-          if (c && c.chat_id) chatIds.add(String(c.chat_id));
-        });
-      }
+      [chats1, chats2].forEach(chatsData => {
+        if (chatsData && Array.isArray(chatsData.chats)) {
+          chatsData.chats.forEach(c => {
+            if (c && c.chat_id) chatIds.add(String(c.chat_id));
+          });
+        }
+      });
 
-      if (updatesData && Array.isArray(updatesData.updates)) {
-        updatesData.updates.forEach(u => {
-          if (u.chat_id) chatIds.add(String(u.chat_id));
-          if (u.user_id) userIds.add(String(u.user_id));
-          if (u.user && u.user.user_id) userIds.add(String(u.user.user_id));
-          if (u.message) {
-            if (u.message.recipient && u.message.recipient.chat_id) {
-              chatIds.add(String(u.message.recipient.chat_id));
+      [updates1, updates2].forEach(updatesData => {
+        if (updatesData && Array.isArray(updatesData.updates)) {
+          updatesData.updates.forEach(u => {
+            if (u.chat_id) chatIds.add(String(u.chat_id));
+            if (u.user_id) userIds.add(String(u.user_id));
+            if (u.user && u.user.user_id) userIds.add(String(u.user.user_id));
+            if (u.message) {
+              if (u.message.recipient && u.message.recipient.chat_id) chatIds.add(String(u.message.recipient.chat_id));
+              if (u.message.sender && u.message.sender.user_id) userIds.add(String(u.message.sender.user_id));
             }
-            if (u.message.sender && u.message.sender.user_id) {
-              userIds.add(String(u.message.sender.user_id));
-            }
-          }
-        });
-      }
-
-      try {
-        const firstChat = Array.from(chatIds)[0];
-        const firstUser = Array.from(userIds)[0];
-        if (firstChat) localStorage.setItem('max_admin_chat_id', firstChat);
-        if (firstUser) localStorage.setItem('max_admin_user_id', firstUser);
-      } catch (e) {}
+          });
+        }
+      });
 
       return { chatIds: Array.from(chatIds), userIds: Array.from(userIds) };
     }
 
     async function postMaxMessage(targetParam, text) {
-      const directUrl = `https://botapi.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`;
-      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(directUrl)}`;
       const bodyStr = JSON.stringify({ text: text });
-
-      await Promise.allSettled([
-        fetchWithTimeout(directUrl, {
+      const endpoints = [
+        `https://platform-api.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`,
+        `https://botapi.max.ru/messages?access_token=${encodeURIComponent(MAX_BOT_TOKEN)}&${targetParam}`
+      ];
+      const tasks = [];
+      endpoints.forEach(ep => {
+        tasks.push(fetchWithTimeout(`https://thingproxy.freeboard.io/fetch/${ep}`, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'application/json', 'Authorization': MAX_BOT_TOKEN },
           body: bodyStr
-        }, 3500),
-        fetchWithTimeout(proxyUrl, {
+        }, 3500));
+        tasks.push(fetchWithTimeout(`https://corsproxy.io/?url=${encodeURIComponent(ep)}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': MAX_BOT_TOKEN
-          },
+          headers: { 'Content-Type': 'application/json', 'Authorization': MAX_BOT_TOKEN },
           body: bodyStr
-        }, 3500)
-      ]);
+        }, 3500));
+      });
+      await Promise.allSettled(tasks);
     }
 
     async function sendToMax(text) {
