@@ -144,7 +144,7 @@
         </h1>
 
         <p class="text-base sm:text-lg text-stone-600 max-w-2xl leading-relaxed">
-          Четыре авторские сценические программы для разных аудиторий: от весёлого детского интерактива с нейросетями (5+) и лекции о русском авангарде (12+) до мощного моноспектакля по программе старших классов (14+) и откровенного разговора на примере Лили Брик (18+).
+          Четыре авторские сценические программы для разных аудиторий: от весёлого детского интерактива с нейросетями (5+) и лекции о русском авангарде (12+) до мощного моноспектакля по программе старших классов (14+) и откровенной авторской лекции на примере Лили Брик (18+).
         </p>
 
         <div class="grid sm:grid-cols-3 gap-4 pt-1">
@@ -281,7 +281,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-6 flex flex-col justify-between card-hover">
           <div>
             <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">Театры и арт-площадки</span>
+              <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">Авторская лекция</span>
               <span class="bg-red-100 text-brandRed font-heading font-bold px-2.5 py-0.5 rounded text-sm">18+</span>
             </div>
             <h3 class="font-heading text-2xl uppercase font-bold mb-2 text-inkDark">Лиля Брик. Искусство быть желанной</h3>
@@ -409,24 +409,21 @@
 
     <!-- 4. Лиля Брик. Искусство быть желанной -->
     <div id="play-brik" class="grid md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-10 rounded-xl border border-stone-200 shadow-sm">
-      <div onclick="openImage(this.querySelector('img').src)" class="md:col-span-5 md:order-2 aspect-[4/5] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative cursor-pointer group">
-        <img id="img-brik" src="https://lh3.googleusercontent.com/d/186400LSzI1lr0F1m7mdZIIQe3GTlVfGo=w1200" onerror="this.onerror=null;this.src='https://drive.google.com/thumbnail?id=186400LSzI1lr0F1m7mdZIIQe3GTlVfGo&sz=w1200';" referrerpolicy="no-referrer" alt="Лиля Брик. Искусство быть желанной — афиша" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+      <div class="md:col-span-5 md:order-2 aspect-[4/3] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative">
+        <img id="img-brik" src="https://lh3.googleusercontent.com/d/1R6k6uRTv1iV0MaN11opLoSibpyCM-fcm=w1200" onerror="this.onerror=null;this.src='https://drive.google.com/thumbnail?id=1R6k6uRTv1iV0MaN11opLoSibpyCM-fcm&sz=w1200';" referrerpolicy="no-referrer" alt="Лиля Брик. Искусство быть желанной" class="w-full h-full object-cover">
       </div>
       <div class="md:col-span-7 md:order-1 space-y-4">
         <div class="flex flex-wrap gap-2">
           <span class="bg-red-100 text-brandRed font-heading uppercase text-xs px-3 py-1 rounded font-bold tracking-wider">18+ (Взрослая аудитория)</span>
-          <span class="bg-stone-100 text-stone-700 font-heading uppercase text-xs px-3 py-1 rounded tracking-wider">Авторская программа</span>
+          <span class="bg-stone-100 text-stone-700 font-heading uppercase text-xs px-3 py-1 rounded tracking-wider">Авторская лекция</span>
         </div>
         <h3 class="font-heading text-3xl sm:text-4xl uppercase font-bold text-inkDark">Лиля Брик. Искусство быть желанной</h3>
         <p class="text-stone-700 leading-relaxed">
           Приглашаю вас на откровенный разговор на примере самой роковой женщины Серебряного века — Лили Брик. Как актер, годами исследующий вселенную Маяковского, и как практик, считывающий энергетику отношений, я покажу вам изнанку мужской психологии: как формируется женская Значимость, какие ошибки обнуляют вашу ценность в его глазах и как вернуть себе состояние Истинной Женщины.
         </p>
-        <div class="flex flex-wrap gap-3 pt-3">
+        <div class="pt-3">
           <button onclick="openModal('Лиля Брик. Искусство быть желанной (18+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
             Оставить заявку
-          </button>
-          <button onclick="openImage(document.getElementById('img-brik').src)" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-6 py-3 rounded-sm font-heading uppercase tracking-wider transition">
-            Посмотреть афишу
           </button>
         </div>
       </div>
@@ -534,7 +531,7 @@
     </div>
   </section>
 
-  <!-- Лайтбокс для просмотра благодарностей и афиш крупным планом -->
+  <!-- Лайтбокс для просмотра благодарностей крупным планом -->
   <div id="lightbox" onclick="this.classList.add('hidden')" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out">
     <img id="lightboxImg" src="" referrerpolicy="no-referrer" alt="Просмотр документа" class="max-h-[92vh] max-w-[92vw] rounded-lg shadow-2xl object-contain">
   </div>
@@ -621,7 +618,7 @@
       kids: 'https://psv4.vkuserphoto.ru/s/v1/d2/OitWBeHCszzKfPe0nL3hZwKeo65ZUJq7WgY615nIFaVU-kNJosK0gzXHc6JfHkq94I1fi2mFsochjz1L6Za8VmKLSijGgXGm-_lrTz3_Nx0fKpVoWWPbP2XbYYXb9RUgm9o4FrAvNDtI/kids.jpg',
       style: 'https://psv4.vkuserphoto.ru/s/v1/d2/l3nNpcT5GaDgBu8MQan_Z54wCy6F3b5DH2scsygTljiPRW0-bIIeJ_xoW9eA_7ck_jjIcJuBIrll1xj49Z51DfEnYpP2295i_CbPyNOeE9zOJwOpxzIJX1HDGINb7e1ivza7kiOlc7U1/style.jpg',
       boat: 'https://psv4.vkuserphoto.ru/s/v1/d2/JybbgPy7keGNMRsajCy3uMjwzU1cp3g5CxiRP4pjmQcIzjD5GapzIq-hQ2ovQ1DU4r2qu_R8zhS87g-R6WwnA48938NL4YOP3J69FTWFTxhss6oSfaExb2SBywlMqWQMs9De_1D6qxeh/boat.jpg',
-      brik: 'https://lh3.googleusercontent.com/d/186400LSzI1lr0F1m7mdZIIQe3GTlVfGo=w1200',
+      brik: 'https://lh3.googleusercontent.com/d/1R6k6uRTv1iV0MaN11opLoSibpyCM-fcm=w1200',
       doc1: 'https://psv4.vkuserphoto.ru/s/v1/d2/P1gWD6wtDomMW5ZvVCSXFkGM2gdnw4W8jvEjnAdWReXiU6rIbosw2meJeF79JXrN1Q48upt8Wk6AzVg7wRVQAOJ_jQQMSOp-IldB9xWVT_ZZAQqLIlo0rHoVqs7sAqZm57OU-xktFVcQ/doc1.jpg',
       doc2: 'https://psv4.vkuserphoto.ru/s/v1/d2/rKSeWgEsmXN8GvbqnjY67UvXFl-g5nugzxQNQUP0ekBa3p9VpUs036KiTJdG155agr-w4T_UwA9ZVPEk-lmRvgSWImS38aHjprRnEtpJFIJv3ipxX4467GneMFkCP7HFhWMSeEo8ZoZn/doc2.jpg',
       doc3: 'https://psv4.vkuserphoto.ru/s/v1/d2/UXn7PraZzdOhidvKQRrqVKZaZwgzLfN1foTH640t1MkYWCKWCDcBsHS5t7zNqoZ1voDUHbiJ0Ew06dx5k3z1sm2k9kfgg0b2U2d34OkqiZiYr4tqZa_9r06A5JdM7ckQARd6EBhokUJo/doc3.jpg',
