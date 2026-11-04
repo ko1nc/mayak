@@ -739,7 +739,7 @@
     }
 
     // =========================================================================
-    // АВТОУВЕДОДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
+    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
@@ -799,56 +799,14 @@
       return str.indexOf('"ok":true') !== -1 || str.indexOf('\\"ok\\":true') !== -1;
     }
 
-    function fireJsonpGateway(fullGetUrl) {
-      return new Promise(resolve => {
-        try {
-          const cbName = 'tg_cb_' + Math.floor(Math.random() * 1000000);
-          const script = document.createElement('script');
-          const timer = setTimeout(() => {
-            cleanup();
-            resolve(false);
-          }, 4500);
-          function cleanup() {
-            clearTimeout(timer);
-            try { delete window[cbName]; } catch (e) {}
-            if (script.parentNode) script.parentNode.removeChild(script);
-          }
-          window[cbName] = function(data) {
-            cleanup();
-            if (isTelegramOk(data)) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          };
-          script.src = `https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&callback=${cbName}&_=${Date.now()}`;
-          script.onerror = function() { cleanup(); resolve(false); };
-          document.body.appendChild(script);
-        } catch (e) {
-          resolve(false);
-        }
-      });
-    }
-
-    // 1. Безотказная отправка через Google Cloud шлюз (доставляет в ТГ, на почту от ko1nc1@gmail.com и в бот MAX)
+    // 1. Отправка через Google Cloud шлюз (1 запрос = 1 сообщение в ТГ, на почту и в MAX)
     async function sendViaGoogleScript(text, program, name, contact) {
       if (!GOOGLE_SCRIPT_URL) return false;
       const chatId = TG_CHAT_ID.trim();
       const emailSubject = `🎭 Заявка vvma.ru: ${program}`;
-      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
 
       try {
-        const img = new Image();
-        img.src = urlWithParams;
-      } catch (e) {}
-
-      await Promise.allSettled([
-        fetchWithTimeout(urlWithParams, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-store'
-        }, 4000),
-        fetchWithTimeout(GOOGLE_SCRIPT_URL, {
+        await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -862,66 +820,48 @@
             contact: contact,
             max_token: MAX_BOT_TOKEN
           })
-        }, 4000)
-      ]);
-      return true;
+        }, 4500);
+        return true;
+      } catch (e) {
+        // Резервный GET-запрос ТОЛЬКО если POST-запрос оборвался из-за сети
+        try {
+          const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
+          await fetchWithTimeout(urlWithParams, { method: 'GET', mode: 'no-cors', cache: 'no-store' }, 4000);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
     }
 
-    // 2. Отправка в Telegram + вызов Google Cloud шлюза
+    // 2. Отправка уведомлений без дублирования
     async function sendToTelegram(text, program, name, contact) {
+      // Сначала отправляем через ваш Google-скрипт (он сам доставит в ТГ, MAX и Gmail)
+      const googleOk = await sendViaGoogleScript(text, program, name, contact);
+      if (googleOk) return true;
+
+      // Прокси запускаются ТОЛЬКО если Google-скрипт оказался недоступен
       if (!TG_BOT_TOKEN) return false;
       const chatId = TG_CHAT_ID.trim();
       const baseApi = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
-      const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
-      const fullGetUrl = `${baseApi}${query}`;
-
-      await sendViaGoogleScript(text, program, name, contact);
-
-      try {
-        const resDirect = await fetchWithTimeout(baseApi, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ chat_id: chatId, text: text }).toString()
-        }, 2500);
-        if (resDirect.ok) {
-          const t = await resDirect.text();
-          if (isTelegramOk(t)) return true;
-        }
-      } catch (e) {}
+      const fullGetUrl = `${baseApi}?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
 
       const proxyUrls = [
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`,
-        `https://corsproxy.org/?${encodeURIComponent(fullGetUrl)}`,
-        `https://thingproxy.freeboard.io/fetch/${fullGetUrl}`
+        `https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`
       ];
 
-      const proxyTasks = proxyUrls.map(async (gw) => {
-        const res = await fetchWithTimeout(gw, { cache: 'no-store' }, 5500);
-        if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
-        const bodyText = await res.text();
-        if (isTelegramOk(bodyText)) return true;
-        throw new Error('Bad payload');
-      });
-
-      proxyTasks.push(
-        fireJsonpGateway(fullGetUrl).then(ok => {
-          if (!ok) throw new Error('JSONP failed');
-          return true;
-        })
-      );
-
-      try {
-        await Promise.any(proxyTasks);
-        return true;
-      } catch (e) {}
-
+      for (const gw of proxyUrls) {
+        try {
+          const res = await fetchWithTimeout(gw, { cache: 'no-store' }, 3500);
+          if (res.ok && isTelegramOk(await res.text())) return true;
+        } catch (e) {}
+      }
       return false;
     }
 
-    // 3. Дополнительная отправка на почту по вашему токену FormSubmit (308947d6baa3b1a2000c7e9a47ca7edd)
+    // 3. Резервная отправка на FormSubmit (только 1 запрос по токену, без дубля)
     async function sendBackupEmail(program, name, contact) {
       const subj = `🎭 Заявка с сайта vvma.ru: ${program}`;
       const payload = JSON.stringify({
@@ -934,18 +874,13 @@
         _template: 'table'
       });
 
-      await Promise.allSettled([
-        fetchWithTimeout(`https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`, {
+      try {
+        await fetchWithTimeout(`https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: payload
-        }, 4000),
-        fetchWithTimeout(`https://formsubmit.co/ajax/${BACKUP_EMAIL}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: payload
-        }, 4000)
-      ]);
+        }, 4000);
+      } catch (e) {}
     }
 
     // Проверка на спам-бота перед отправкой
@@ -1025,13 +960,15 @@
 
       const timer = setTimeout(finishSubmission, 4000);
 
-      Promise.allSettled([
-        sendToTelegram(tgMessage, program, name, phone),
-        sendBackupEmail(program, name, phone)
-      ]).then(() => {
-        clearTimeout(timer);
-        finishSubmission();
-      });
+      // Отправляем через основной шлюз, а FormSubmit вызываем только если Google-шлюз не ответил
+      sendToTelegram(tgMessage, program, name, phone)
+        .then((ok) => {
+          if (!ok) return sendBackupEmail(program, name, phone);
+        })
+        .finally(() => {
+          clearTimeout(timer);
+          finishSubmission();
+        });
     }
   </script>
 </body>
