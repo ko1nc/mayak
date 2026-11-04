@@ -88,6 +88,17 @@
       transform: translateY(-6px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     }
+    /* Невидимая ловушка для спам-ботов (Honeypot) */
+    .hp-trap {
+      position: absolute !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      width: 1px !important;
+      height: 1px !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      overflow: hidden !important;
+    }
   </style>
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
@@ -617,8 +628,16 @@
       <span class="text-xs uppercase tracking-widest text-brandRed font-bold">Организация показов и гастролей</span>
       <h3 class="font-heading text-3xl uppercase font-bold mt-1 mb-4 text-inkDark">Оставить заявку</h3>
       
-      <form id="bookingForm" name="booking" method="POST" data-netlify="true" onsubmit="submitForm(event)" class="space-y-4">
+      <form id="bookingForm" name="booking" method="POST" data-netlify="true" netlify-honeypot="website_url" onsubmit="submitForm(event)" class="space-y-4">
         <input type="hidden" name="form-name" value="booking">
+
+        <!-- Скрытые поля-ловушки (Honeypot) против спам-ботов -->
+        <div class="hp-trap" aria-hidden="true">
+          <label for="hpWebsite">Ваш сайт (не заполнять)</label>
+          <input type="text" name="website_url" id="hpWebsite" tabindex="-1" autocomplete="off" value="">
+          <input type="text" name="_honey" id="hpHoney" tabindex="-1" autocomplete="off" value="">
+        </div>
+
         <div>
           <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Интересующая программа</label>
           <input type="text" name="program" id="programInput" readonly class="w-full bg-stone-100 border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark font-semibold">
@@ -687,9 +706,25 @@
 
     const PERSONAL_MAX_LINK = 'https://web.max.ru/';
 
+    // Переменные антибот-защиты
+    let isHumanInteracted = false;
+    let isModalOpened = false;
+    let modalOpenedAt = 0;
+    let hasUserTyped = false;
+
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.personal-max-link').forEach(link => {
         link.href = PERSONAL_MAX_LINK;
+      });
+
+      // Отслеживание реального ввода или автозаполнения в полях формы
+      ['nameInput', 'phoneInput'].forEach(id => {
+        const inputEl = document.getElementById(id);
+        if (inputEl) {
+          inputEl.addEventListener('input', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
+          inputEl.addEventListener('change', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
+          inputEl.addEventListener('keydown', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
+        }
       });
     });
 
@@ -704,7 +739,7 @@
     }
 
     // =========================================================================
-    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
+    // АВТОУВЕДОДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
@@ -712,9 +747,6 @@
     const FORMSUBMIT_TOKEN = '308947d6baa3b1a2000c7e9a47ca7edd';
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvr3-YQCb6mudHDTdYH7broiyzAkEcM1CjnS1abb2YdtKCUXqHjEeZ2Eh9vrtY_j0GiQ/exec';
     const MAX_BOT_TOKEN = 'f9LHodD0cOLGeaYy8TzD_3zw8aVzz6WsY9Naa8PpMCCxyju4prOgVIawjMhnxSV63RgHPpZLGhNXn0navnj8';
-
-    let isHumanInteracted = false;
-    let isModalOpened = false;
 
     window.addEventListener('pointermove', () => { isHumanInteracted = true; }, { once: true, passive: true });
     window.addEventListener('touchstart', () => { isHumanInteracted = true; }, { once: true, passive: true });
@@ -738,8 +770,11 @@
     function openModal(programName) {
       isHumanInteracted = true;
       isModalOpened = true;
+      modalOpenedAt = Date.now();
       trackGoal('open_modal', { program: programName });
       document.getElementById('programInput').value = programName;
+      document.getElementById('hpWebsite').value = '';
+      document.getElementById('hpHoney').value = '';
       document.getElementById('bookingForm').classList.remove('hidden');
       document.getElementById('successMsg').classList.add('hidden');
       document.getElementById('submitBtn').innerText = 'Отправить заявку';
@@ -892,6 +927,7 @@
       const payload = JSON.stringify({
         _subject: subj,
         _captcha: 'false',
+        _honey: '',
         Программа: program,
         Организация_и_Имя: name,
         Контакт: contact,
@@ -912,6 +948,39 @@
       ]);
     }
 
+    // Проверка на спам-бота перед отправкой
+    function isSpamBot(program, name, phone) {
+      const hp1 = (document.getElementById('hpWebsite')?.value || '').trim();
+      const hp2 = (document.getElementById('hpHoney')?.value || '').trim();
+
+      // 1. Сработала скрытая ловушка Honeypot
+      if (hp1 !== '' || hp2 !== '') return true;
+
+      // 2. Форма отправлена без открытия окна, без движений/ввода или быстрее чем за 2 секунды
+      const timeSpent = Date.now() - modalOpenedAt;
+      if (!isModalOpened || !isHumanInteracted || !hasUserTyped || timeSpent < 2000) return true;
+
+      // 3. Проверка корректности программы и наличия кириллицы в имени
+      if (!/[А-Яа-яЁё]/.test(program) || !/[А-Яа-яЁё]/.test(name) || name.length < 2) return true;
+
+      // 4. Запрет ссылок в полях имени и контакта
+      const urlRegex = /https?:\/\/|www\.|\.ru\/|\.com\//i;
+      if (urlRegex.test(name) || urlRegex.test(phone)) return true;
+
+      // 5. Контакт должен содержать либо минимум 7 цифр (телефон), либо символ @ (почта/ник)
+      const digitsCount = (phone.match(/\d/g) || []).length;
+      const hasAtSymbol = phone.indexOf('@') !== -1;
+      if (digitsCount < 7 && !hasAtSymbol) return true;
+
+      // 6. Защита от частых повторных отправок (не чаще 1 раза в 45 секунд)
+      try {
+        const lastSubmit = parseInt(localStorage.getItem('vvma_last_submit') || '0', 10);
+        if (Date.now() - lastSubmit < 45000) return true;
+      } catch (e) {}
+
+      return false;
+    }
+
     function submitForm(e) {
       e.preventDefault();
 
@@ -920,11 +989,16 @@
       const phone = document.getElementById('phoneInput').value.trim();
       const form = document.getElementById('bookingForm');
 
-      if (!isModalOpened || !/[А-Яа-яЁё]/.test(program)) {
+      // Если это спам-бот — тихо показываем «Заявка принята», но ничего не отправляем и не триггерим Метрику
+      if (isSpamBot(program, name, phone)) {
         form.classList.add('hidden');
         document.getElementById('successMsg').classList.remove('hidden');
         return;
       }
+
+      try {
+        localStorage.setItem('vvma_last_submit', String(Date.now()));
+      } catch (err) {}
 
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'Отправка...';
