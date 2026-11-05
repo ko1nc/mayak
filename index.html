@@ -99,6 +99,20 @@
       pointer-events: none !important;
       overflow: hidden !important;
     }
+    /* Конструктивистский стиль для вкладки тест-дуэли */
+    .rosta-box {
+      border: 3px solid #171717;
+      box-shadow: 6px 6px 0px #171717;
+    }
+    .rosta-btn {
+      border: 3px solid #171717;
+      box-shadow: 4px 4px 0px #171717;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+    }
+    .rosta-btn:active:not(:disabled) {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px #171717;
+    }
   </style>
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
@@ -115,6 +129,123 @@
   <!-- /Yandex.Metrika counter -->
 </head>
 <body id="top" class="bg-bgWarm text-inkDark font-sans antialiased selection:bg-brandRed selection:text-white">
+
+  <!-- ===================================================================== -->
+  <!-- СКРЫТАЯ ВКЛАДКА: ТЕСТ-ДУЭЛЬ (открывается только по #quiz или ?quiz)   -->
+  <!-- ===================================================================== -->
+  <div id="quizView" class="hidden min-h-screen bg-bgWarm text-inkDark flex flex-col justify-between relative overflow-hidden">
+    <!-- Декоративная конструктивистская полоса сверху -->
+    <div class="bg-inkDark text-white border-b-4 border-brandRed py-3 px-4">
+      <div class="max-w-xl mx-auto flex items-center justify-between">
+        <span class="font-heading uppercase tracking-widest text-xs sm:text-sm text-brandRed font-bold bg-white px-2 py-0.5">
+          Окна РОСТА • 2026
+        </span>
+        <span id="quizStepBadge" class="font-heading uppercase tracking-widest text-sm font-bold text-stone-200">
+          Выстрел 01 / 05
+        </span>
+      </div>
+    </div>
+
+    <!-- Основной контейнер квиза (адаптирован под экран смартфона) -->
+    <main class="flex-1 flex flex-col justify-center max-w-xl w-full mx-auto px-4 py-6 sm:py-10">
+      
+      <!-- Шапка теста -->
+      <div id="quizHeader" class="mb-5">
+        <div class="inline-block bg-brandRed text-white font-heading uppercase text-xs tracking-widest px-2.5 py-1 font-bold transform -rotate-1 mb-2">
+          Литературная проверка боем
+        </div>
+        <h1 class="font-heading text-2xl sm:text-4xl uppercase font-bold leading-none tracking-tight text-inkDark">
+          Тест-дуэль: <span class="text-brandRed">отличишь реальный факт</span> о Маяковском от пошлой сплетни?
+        </h1>
+        <!-- Прогресс-бар в стиле авангарда -->
+        <div class="w-full h-3 bg-white border-2 border-inkDark mt-4 overflow-hidden">
+          <div id="quizProgressBar" class="h-full bg-brandRed transition-all duration-300" style="width: 20%"></div>
+        </div>
+      </div>
+
+      <!-- Карточка вопроса -->
+      <div id="quizCard" class="bg-white rosta-box p-5 sm:p-7 flex flex-col justify-between space-y-5">
+        <div>
+          <div class="flex items-center justify-between border-b-2 border-stone-200 pb-2.5 mb-4">
+            <span id="quizTopic" class="font-heading uppercase text-xs tracking-widest text-stone-500 font-bold">
+              Утверждение №1
+            </span>
+            <span class="font-heading uppercase text-xs tracking-widest text-brandRed font-bold">
+              Правда или миф?
+            </span>
+          </div>
+          <p id="quizQuestionText" class="text-base sm:text-xl font-semibold text-inkDark leading-snug">
+            Загрузка вопроса...
+          </p>
+        </div>
+
+        <!-- Кнопки выбора (крупные для нажатия пальцем с телефона) -->
+        <div id="quizButtons" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+          <button type="button" onclick="handleQuizAnswer(true)" class="rosta-btn bg-white hover:bg-stone-100 text-inkDark font-heading uppercase text-lg py-4 px-5 font-bold tracking-wider flex items-center justify-center gap-2">
+            <span class="text-brandRed text-xl leading-none">✓</span> Реальный факт
+          </button>
+          <button type="button" onclick="handleQuizAnswer(false)" class="rosta-btn bg-inkDark hover:bg-stone-800 text-white font-heading uppercase text-lg py-4 px-5 font-bold tracking-wider flex items-center justify-center gap-2">
+            <span class="text-brandGold text-xl leading-none">✕</span> Пошлая сплетня
+          </button>
+        </div>
+
+        <!-- Блок разбора ответа (появляется после клика) -->
+        <div id="quizFeedback" class="hidden space-y-4 pt-2 border-t-2 border-inkDark">
+          <div id="quizVerdictStamp" class="inline-block font-heading uppercase text-sm sm:text-base px-3 py-1 font-bold tracking-wider">
+            Вердикт
+          </div>
+          <p id="quizExplanation" class="text-sm sm:text-base text-stone-700 leading-relaxed"></p>
+          <button type="button" id="quizNextBtn" onclick="nextQuizQuestion()" class="w-full rosta-btn bg-brandRed hover:bg-red-700 text-white font-heading uppercase text-lg py-4 font-bold tracking-wider">
+            Следующий вопрос →
+          </button>
+        </div>
+      </div>
+
+      <!-- Финальный экран после 5 вопросов -->
+      <div id="quizResultCard" class="hidden bg-white rosta-box p-6 sm:p-8 text-center space-y-5">
+        <div class="inline-block bg-inkDark text-white font-heading uppercase text-xs tracking-widest px-3 py-1">
+          Дуэль окончена
+        </div>
+        <div class="font-heading text-5xl sm:text-6xl font-bold text-brandRed leading-none" id="quizScoreText">
+          5 / 5
+        </div>
+        <h2 id="quizRankTitle" class="font-heading text-2xl sm:text-3xl uppercase font-bold text-inkDark">
+          Товарищ Маяковский жмёт вам руку!
+        </h2>
+        <p id="quizRankDesc" class="text-sm sm:text-base text-stone-700 leading-relaxed">
+          Вокруг имени поэта за сто лет нагромоздили столько бульварных небылиц и чужих рифм, что за ними почти не видно живого человека.
+        </p>
+
+        <div class="bg-bgWarm border-2 border-inkDark p-4 text-left space-y-2">
+          <p class="font-heading uppercase text-sm font-bold text-brandRed tracking-wider">
+            ⚡ Главный разбор мифов
+          </p>
+          <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+            Посмотрите короткое видеообращение актёра и режиссёра Николая Пасечника — о том, какие мифы и фальшивки приписывают Маяковскому и каким он был на самом деле.
+          </p>
+        </div>
+
+        <a href="https://vvma.ru/#video" onclick="finishQuizAndGoToVideo(event)" class="block w-full rosta-btn bg-brandRed hover:bg-red-700 text-white font-heading uppercase text-lg sm:text-xl py-4 px-6 font-bold tracking-wider text-center">
+          ▶ Перейти к разбору основных мифов
+        </a>
+
+        <button type="button" onclick="restartQuiz()" class="text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-inkDark underline pt-1">
+          Пройти тест заново
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Компактный подвал квиза -->
+    <footer class="py-4 px-4 text-center text-xs text-stone-500 border-t border-stone-200">
+      Авторский театральный проект Николая Пасечника • vvma.ru
+    </footer>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- ОСНОВНОЙ ЛЕНДИНГ САЙТА (без кнопок и ссылок на вкладку с тестом)      -->
+  <!-- ===================================================================== -->
+  <div id="mainLandingView">
 
   <!-- Светлая шапка сайта -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200 shadow-sm">
@@ -503,367 +634,3 @@
       <div class="md:col-span-7 space-y-5">
         <span class="text-brandRed font-heading uppercase tracking-widest text-sm font-bold">Удобные варианты проведения для школ, ДК и библиотек</span>
         <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold text-inkDark">
-          Как организовать показ на вашей площадке
-        </h2>
-        <p class="text-stone-600 leading-relaxed">
-          Проект легко адаптируется под разные площадки и технические возможности. Вы можете выбрать любой удобный для вашего учреждения способ проведения:
-        </p>
-        <div class="grid sm:grid-cols-2 gap-4 pt-2">
-          <div class="bg-bgWarm p-5 rounded-lg border border-stone-200">
-            <span class="bg-brandRed text-white text-xs font-bold uppercase px-2.5 py-1 rounded">Вариант 1 • По закупке</span>
-            <h4 class="font-heading text-xl uppercase font-bold mt-3">Через «Электронный магазин» СПб (44-ФЗ / 223-ФЗ)</h4>
-            <p class="text-sm text-stone-600 mt-2">
-              Программы опубликованы в каталоге ГИС «Электронный магазин». Высылаем прямые ссылки на позиции, КП и полный пакет документов по ЭДО.
-            </p>
-          </div>
-          <div class="bg-bgWarm p-5 rounded-lg border border-stone-200">
-            <span class="bg-inkDark text-white text-xs font-bold uppercase px-2.5 py-1 rounded">Вариант 2 • По билетам</span>
-            <h4 class="font-heading text-xl uppercase font-bold mt-3">Выездной показ по билетам без затрат бюджета</h4>
-            <p class="text-sm text-stone-600 mt-2">
-              Приезжаем со своим оборудованием в ваш актовый зал. Оплата по официальным электронным билетам — детям не нужно никуда ехать на автобусах.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Карточка реквизитов поставщика -->
-      <div class="md:col-span-5 bg-bgWarm rounded-xl border border-stone-300 p-8 space-y-4 shadow-sm">
-        <span class="text-xs font-bold uppercase tracking-widest text-brandRed block">Карточка поставщика</span>
-        <h3 class="font-heading text-2xl uppercase font-bold text-inkDark">ИП Пасечник Николай Викторович</h3>
-        <div class="bg-white p-5 rounded-lg border border-stone-200 text-sm text-stone-700 space-y-2 font-mono">
-          <p><strong>ИНН:</strong> 772169697720</p>
-          <p><strong>ОГРНИП:</strong> 326774600494865</p>
-          <p><strong>ЭДО / ГИС СПб:</strong> Подключен</p>
-          <p><strong>Тел. / MAX:</strong> +7 (995) 005-68-20</p>
-          <p><strong>E-mail:</strong> ko1nc1@gmail.com</p>
-        </div>
-        <button onclick="openModal('Запрос КП и ссылки на Электронный магазин')" class="w-full bg-inkDark hover:bg-brandRed text-white font-heading uppercase tracking-wider py-3.5 rounded-sm transition">
-          Запросить КП для бухгалтерии
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Блок с основным видеороликом из ВК Видео -->
-  <section id="video" class="py-16 sm:py-20 bg-bgWarm border-b border-stone-200">
-    <div class="max-w-5xl mx-auto px-4 sm:px-8 text-center">
-      <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold mb-8">Слово в защиту поэта: обращение к зрителям и организаторам</h2>
-
-      <div class="aspect-video bg-black rounded-xl overflow-hidden shadow-xl border border-stone-300 relative">
-        <iframe 
-          src="https://vk.ru/video_ext.php?oid=3336363&id=456239443&autoplay=0" 
-          class="w-full h-full border-0"
-          style="background-color: #000" 
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" 
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-  </section>
-
-  <!-- Блок: 8 Благодарственных писем -->
-  <section id="reviews" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-8">
-    <div class="mb-10">
-      <h2 class="font-heading text-3xl sm:text-5xl uppercase font-bold text-inkDark">Благодарственные письма и отзывы</h2>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc1" src="https://psv4.vkuserphoto.ru/s/v1/d2/P1gWD6wtDomMW5ZvVCSXFkGM2gdnw4W8jvEjnAdWReXiU6rIbosw2meJeF79JXrN1Q48upt8Wk6AzVg7wRVQAOJ_jQQMSOp-IldB9xWVT_ZZAQqLIlo0rHoVqs7sAqZm57OU-xktFVcQ/doc1.jpg" referrerpolicy="no-referrer" alt="Благодарность 1" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc2" src="https://psv4.vkuserphoto.ru/s/v1/d2/rKSeWgEsmXN8GvbqnjY67UvXFl-g5nugzxQNQUP0ekBa3p9VpUs036KiTJdG155agr-w4T_UwA9ZVPEk-lmRvgSWImS38aHjprRnEtpJFIJv3ipxX4467GneMFkCP7HFhWMSeEo8ZoZn/doc2.jpg" referrerpolicy="no-referrer" alt="Благодарность 2" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc3" src="https://psv4.vkuserphoto.ru/s/v1/d2/UXn7PraZzdOhidvKQRrqVKZaZwgzLfN1foTH640t1MkYWCKWCDcBsHS5t7zNqoZ1voDUHbiJ0Ew06dx5k3z1sm2k9kfgg0b2U2d34OkqiZiYr4tqZa_9r06A5JdM7ckQARd6EBhokUJo/doc3.jpg" referrerpolicy="no-referrer" alt="Благодарность 3" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc4" src="https://psv4.vkuserphoto.ru/s/v1/d2/I7lRGIudrGevC3owMmUQxQBZyLcpaJWnZqGFpfi-6gG1H9RyzMk4l1xrlZ4Sxn6vhnfwWzUXhdHlajY4nlxkhzmGUxbevNhNIV0_89maDuVDL2dkOSKsS1pYlVUNx7cRXIcX7c-q5gGI/doc4.jpg" referrerpolicy="no-referrer" alt="Благодарность 4" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc5" src="https://psv4.vkuserphoto.ru/s/v1/d2/JG1fZDvKap7Q8HFVGqlKs9ZKJPpZTaBdPAemx6A_dVRLB__DWowBmq7RKE4T4gcWBIqkPDkOhYZUSbUKJY38Ms5j1m-nJxCHWgZEfBYo_UbzNN8ZnxMF3zF4bUu-RpYGk6iheIi2Jxlj/doc5.jpg" referrerpolicy="no-referrer" alt="Благодарность 5" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc6" src="https://psv4.vkuserphoto.ru/s/v1/d2/rXKGMLUCXJTvbYqsJwTNQzu4v9sGUJietzBiujtRSbsJ4t01wNgMDENkf1xV9qqk1gT201ERTZZBqB8FE387GuZBOeLOdV4L4Vn7wIkM9Fq_loJbQmqQ-f9uIK74Vdg2VhOLRRmF7xyx/doc6.jpg" referrerpolicy="no-referrer" alt="Благодарность 6" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc7" src="https://psv4.vkuserphoto.ru/s/v1/d2/wTSURHWGfqTXcmsk9zAKOvhITBUbyVXhGzhS4-TDCqyfWc-glAPBeTjyLM__B5VjWW98TqIG3cDXDI9tzOhXCrCJCc9v2PFnDtM3bTPEHR2tgRswSjZdTubGwoMOOKjMikHK6j1ghAMX/doc7.jpg" referrerpolicy="no-referrer" alt="Благодарность 7" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-      <div onclick="openImage(this.querySelector('img').src)" class="cursor-pointer bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden card-hover">
-        <img id="img-doc8" src="https://psv4.vkuserphoto.ru/s/v1/d2/30_1Ae3qO1eCTDpLrJQGeI77LandHPHEZAXIYqUEo4gGJutxkqkmkNkr0CcvUVsloEufFqi2Uh9_WQScuLkypFSFpGeK2DJtDn6_E1d6akacIL-pdQIcRCSK1suLtI5KSbvm55XzLD-V/doc8.jpg" referrerpolicy="no-referrer" alt="Благодарность 8" class="w-full aspect-[1/1.38] object-cover object-center">
-      </div>
-    </div>
-  </section>
-
-  <!-- Лайтбокс для просмотра благодарностей крупным планом -->
-  <div id="lightbox" onclick="this.classList.add('hidden')" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out">
-    <img id="lightboxImg" src="" referrerpolicy="no-referrer" alt="Просмотр документа" class="max-h-[92vh] max-w-[92vw] rounded-lg shadow-2xl object-contain">
-  </div>
-
-  <!-- Подвал сайта -->
-  <footer class="bg-inkDark text-white py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-      <div>
-        <p class="font-heading text-2xl uppercase font-bold">Николай Пасечник</p>
-        <p class="text-stone-300 text-sm mt-1">Артист, режиссёр и театральный продюсер • Санкт-Петербург / Москва</p>
-        <p class="text-stone-400 text-xs mt-2 font-mono">ИП Пасечник Н. В. • ИНН 772169697720 • ОГРНИП 326774600494865 • Тел. / MAX: +7 (995) 005-68-20</p>
-      </div>
-      <div class="flex flex-wrap gap-3">
-        <a href="https://vk.me/ko1yan" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
-          Написать в ВК (в личку)
-        </a>
-        <a href="https://web.max.ru/" target="_blank" rel="noopener" onclick="openPersonalMax(event)" class="personal-max-link bg-white/10 hover:bg-white/20 text-white font-heading uppercase tracking-wider px-5 py-3 text-sm rounded-sm transition">
-          Написать в MAX: +7 (995) 005-68-20
-        </a>
-        <button onclick="openModal('Связь с продюсером')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 text-sm rounded-sm transition">
-          Оставить заявку
-        </button>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Модальное окно заявки -->
-  <div id="modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl border-2 border-brandRed max-w-md w-full p-6 sm:p-8 relative shadow-2xl">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-inkDark text-2xl leading-none">&times;</button>
-      <span class="text-xs uppercase tracking-widest text-brandRed font-bold">Организация показов и гастролей</span>
-      <h3 class="font-heading text-3xl uppercase font-bold mt-1 mb-4 text-inkDark">Оставить заявку</h3>
-      
-      <form id="bookingForm" name="booking" method="POST" data-netlify="true" netlify-honeypot="bot_check_field" onsubmit="submitForm(event)" class="space-y-4">
-        <input type="hidden" name="form-name" value="booking">
-
-        <!-- Скрытое поле-ловушка (Honeypot) против спам-ботов -->
-        <div class="hp-trap" aria-hidden="true">
-          <input type="text" name="bot_check_field" id="hpTrapInput" tabindex="-1" autocomplete="new-password" value="">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Интересующая программа</label>
-          <input type="text" name="program" id="programInput" readonly class="w-full bg-stone-100 border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark font-semibold">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Ваше имя и учреждение (Школа / ДК / Театр)</label>
-          <input type="text" name="organization" id="nameInput" required placeholder="Например: Елена, Гимназия № 24" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-stone-500 mb-1">Ваш телефон или E-mail для связи</label>
-          <input type="text" name="contact" id="phoneInput" required placeholder="+7 (999) 000-00-00 или e-mail" class="w-full bg-white border border-stone-300 rounded px-3 py-2.5 text-sm text-inkDark focus:border-brandRed outline-none">
-        </div>
-        <button type="submit" id="submitBtn" class="w-full bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider py-3.5 text-lg rounded-sm shadow transition">
-          Отправить заявку
-        </button>
-      </form>
-
-      <!-- Сообщение об успешной отправке -->
-      <div id="successMsg" class="hidden text-center py-6 space-y-3">
-        <div class="w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
-        <h4 class="font-heading text-2xl uppercase font-bold text-inkDark">Заявка принята!</h4>
-        <p class="text-sm text-stone-600">Николай свяжется с вами в ближайшее время.</p>
-      </div>
-
-      <!-- Прямые кнопки для мгновенной связи -->
-      <div class="mt-5 pt-4 border-t border-stone-200 text-center space-y-2">
-        <p class="text-xs text-stone-500">Или напишите напрямую удобным способом:</p>
-        <div class="flex flex-wrap justify-center gap-2 text-xs font-semibold">
-          <a id="vkDirectBtn" href="https://vk.me/ko1yan" target="_blank" rel="noopener" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
-            ВКонтакте (в личку)
-          </a>
-          <a id="maxDirectBtn" href="https://web.max.ru/" target="_blank" rel="noopener" onclick="openPersonalMax(event)" class="personal-max-link bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
-            MAX: +7 (995) 005-68-20
-          </a>
-          <a id="mailDirectBtn" href="mailto:ko1nc1@gmail.com" class="bg-stone-100 hover:bg-stone-200 text-inkDark px-3 py-2 rounded transition">
-            ko1nc1@gmail.com
-          </a>
-        </div>
-        <p id="maxCopyNotice" class="hidden text-xs text-brandRed font-semibold pt-1">
-          ✓ Номер +79950056820 скопирован для диалога в MAX
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const PHOTOS = {
-      hero: 'https://sun9-85.vkuserphoto.ru/s/v1/ig2/3TdZG54QnqcccfgUqTTEDKV2ydJOGXU2Ed1j-4UHq0T4eaeU1zJrYMMn9KR84y21pLKvcOt5qoOlQRcSVH6v8YDl.jpg?quality=95&as=32x44,48x65,72x98,108x147,160x218,240x327,360x491,480x654,540x736,640x872,720x981,1080x1472,1280x1744,1440x1962,1585x2160&from=bu&u=UQP7vyGwR1_46Mo7yYpKj7lMdG-uPWM8f1aRTjX_EWQ&cs=1585x0',
-      kids: 'https://psv4.vkuserphoto.ru/s/v1/d2/OitWBeHCszzKfPe0nL3hZwKeo65ZUJq7WgY615nIFaVU-kNJosK0gzXHc6JfHkq94I1fi2mFsochjz1L6Za8VmKLSijGgXGm-_lrTz3_Nx0fKpVoWWPbP2XbYYXb9RUgm9o4FrAvNDtI/kids.jpg',
-      style: 'https://psv4.vkuserphoto.ru/s/v1/d2/l3nNpcT5GaDgBu8MQan_Z54wCy6F3b5DH2scsygTljiPRW0-bIIeJ_xoW9eA_7ck_jjIcJuBIrll1xj49Z51DfEnYpP2295i_CbPyNOeE9zOJwOpxzIJX1HDGINb7e1ivza7kiOlc7U1/style.jpg',
-      brik: 'https://lh3.googleusercontent.com/d/1R6k6uRTv1iV0MaN11opLoSibpyCM-fcm=w1200',
-      doc1: 'https://psv4.vkuserphoto.ru/s/v1/d2/P1gWD6wtDomMW5ZvVCSXFkGM2gdnw4W8jvEjnAdWReXiU6rIbosw2meJeF79JXrN1Q48upt8Wk6AzVg7wRVQAOJ_jQQMSOp-IldB9xWVT_ZZAQqLIlo0rHoVqs7sAqZm57OU-xktFVcQ/doc1.jpg',
-      doc2: 'https://psv4.vkuserphoto.ru/s/v1/d2/rKSeWgEsmXN8GvbqnjY67UvXFl-g5nugzxQNQUP0ekBa3p9VpUs036KiTJdG155agr-w4T_UwA9ZVPEk-lmRvgSWImS38aHjprRnEtpJFIJv3ipxX4467GneMFkCP7HFhWMSeEo8ZoZn/doc2.jpg',
-      doc3: 'https://psv4.vkuserphoto.ru/s/v1/d2/UXn7PraZzdOhidvKQRrqVKZaZwgzLfN1foTH640t1MkYWCKWCDcBsHS5t7zNqoZ1voDUHbiJ0Ew06dx5k3z1sm2k9kfgg0b2U2d34OkqiZiYr4tqZa_9r06A5JdM7ckQARd6EBhokUJo/doc3.jpg',
-      doc4: 'https://psv4.vkuserphoto.ru/s/v1/d2/I7lRGIudrGevC3owMmUQxQBZyLcpaJWnZqGFpfi-6gG1H9RyzMk4l1xrlZ4Sxn6vhnfwWzUXhdHlajY4nlxkhzmGUxbevNhNIV0_89maDuVDL2dkOSKsS1pYlVUNx7cRXIcX7c-q5gGI/doc4.jpg',
-      doc5: 'https://psv4.vkuserphoto.ru/s/v1/d2/JG1fZDvKap7Q8HFVGqlKs9ZKJPpZTaBdPAemx6A_dVRLB__DWowBmq7RKE4T4gcWBIqkPDkOhYZUSbUKJY38Ms5j1m-nJxCHWgZEfBYo_UbzNN8ZnxMF3zF4bUu-RpYGk6iheIi2Jxlj/doc5.jpg',
-      doc6: 'https://psv4.vkuserphoto.ru/s/v1/d2/rXKGMLUCXJTvbYqsJwTNQzu4v9sGUJietzBiujtRSbsJ4t01wNgMDENkf1xV9qqk1gT201ERTZZBqB8FE387GuZBOeLOdV4L4Vn7wIkM9Fq_loJbQmqQ-f9uIK74Vdg2VhOLRRmF7xyx/doc6.jpg',
-      doc7: 'https://psv4.vkuserphoto.ru/s/v1/d2/wTSURHWGfqTXcmsk9zAKOvhITBUbyVXhGzhS4-TDCqyfWc-glAPBeTjyLM__B5VjWW98TqIG3cDXDI9tzOhXCrCJCc9v2PFnDtM3bTPEHR2tgRswSjZdTubGwoMOOKjMikHK6j1ghAMX/doc7.jpg',
-      doc8: 'https://psv4.vkuserphoto.ru/s/v1/d2/30_1Ae3qO1eCTDpLrJQGeI77LandHPHEZAXIYqUEo4gGJutxkqkmkNkr0CcvUVsloEufFqi2Uh9_WQScuLkypFSFpGeK2DJtDn6_E1d6akacIL-pdQIcRCSK1suLtI5KSbvm55XzLD-V/doc8.jpg'
-    };
-
-    Object.keys(PHOTOS).forEach(key => {
-      const el = document.getElementById('img-' + key);
-      if (el && PHOTOS[key]) el.src = PHOTOS[key];
-    });
-
-    // Снимаем старую блокировку из localStorage, если она осталась от прошлого теста
-    try { localStorage.removeItem('vvma_last_submit'); } catch (e) {}
-
-    const PERSONAL_MAX_LINK = 'https://web.max.ru/';
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.personal-max-link').forEach(link => {
-        link.href = PERSONAL_MAX_LINK;
-      });
-    });
-
-    function openPersonalMax(e) {
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText('+79950056820');
-        }
-        const notice = document.getElementById('maxCopyNotice');
-        if (notice) notice.classList.remove('hidden');
-      } catch (err) {}
-    }
-
-    // =========================================================================
-    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
-    // =========================================================================
-    const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
-    const TG_CHAT_ID = '57473050';
-    const BACKUP_EMAIL = 'ko1nc1@gmail.com';
-    const FORMSUBMIT_TOKEN = '308947d6baa3b1a2000c7e9a47ca7edd';
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvr3-YQCb6mudHDTdYH7broiyzAkEcM1CjnS1abb2YdtKCUXqHjEeZ2Eh9vrtY_j0GiQ/exec';
-    const MAX_BOT_TOKEN = 'f9LHodD0cOLGeaYy8TzD_3zw8aVzz6WsY9Naa8PpMCCxyju4prOgVIawjMhnxSV63RgHPpZLGhNXn0navnj8';
-
-    let isHumanInteracted = false;
-    let isModalOpened = false;
-
-    window.addEventListener('pointermove', () => { isHumanInteracted = true; }, { once: true, passive: true });
-    window.addEventListener('touchstart', () => { isHumanInteracted = true; }, { once: true, passive: true });
-    window.addEventListener('keydown', () => { isHumanInteracted = true; }, { once: true, passive: true });
-    window.addEventListener('scroll', () => { isHumanInteracted = true; }, { once: true, passive: true });
-
-    function openImage(src) {
-      document.getElementById('lightboxImg').src = src;
-      document.getElementById('lightbox').classList.remove('hidden');
-    }
-
-    function trackGoal(goalName, params) {
-      try {
-        if (!isHumanInteracted) return;
-        if (typeof window.ym === 'function') {
-          window.ym(113768228, 'reachGoal', goalName, params || {});
-        }
-      } catch (err) {}
-    }
-
-    function openModal(programName) {
-      isHumanInteracted = true;
-      isModalOpened = true;
-      trackGoal('open_modal', { program: programName });
-      document.getElementById('programInput').value = programName;
-      const trap = document.getElementById('hpTrapInput');
-      if (trap) trap.value = '';
-      document.getElementById('bookingForm').classList.remove('hidden');
-      document.getElementById('successMsg').classList.add('hidden');
-      document.getElementById('submitBtn').innerText = 'Отправить заявку';
-      document.getElementById('submitBtn').disabled = false;
-      document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
-
-    function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      return fetch(url, { ...options, keepalive: true, signal: controller.signal })
-        .finally(() => clearTimeout(id));
-    }
-
-    // Отправка ровно 1 запроса через Google Cloud шлюз (доставляет по 1 сообщению в ТГ, на почту и в MAX)
-    async function sendViaGoogleScript(text, program, name, contact) {
-      if (!GOOGLE_SCRIPT_URL) return false;
-      const chatId = TG_CHAT_ID.trim();
-      const emailSubject = `🎭 Заявка vvma.ru: ${program}`;
-
-      try {
-        await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            token: TG_BOT_TOKEN,
-            chat_id: chatId,
-            subject: emailSubject,
-            text: text,
-            email: BACKUP_EMAIL,
-            name: name,
-            contact: contact,
-            max_token: MAX_BOT_TOKEN
-          })
-        }, 4500);
-        return true;
-      } catch (e) {
-        try {
-          const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
-          await fetchWithTimeout(urlWithParams, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'no-store'
-          }, 4000);
-          return true;
-        } catch (err) {
-          return false;
-        }
-      }
-    }
-
-    function submitForm(e) {
-      e.preventDefault();
-
-      const program = document.getElementById('programInput').value.trim();
-      const name = document.getElementById('nameInput').value.trim();
-      const phone = document.getElementById('phoneInput').value.trim();
-      const trapVal = (document.getElementById('hpTrapInput')?.value || '').trim();
-      const form = document.getElementById('bookingForm');
-
-      // Блокируем только если сработала скрытая ловушка Honeypot или окно не открывалось человеком
-      if (trapVal !== '' || !isModalOpened || !/[А-Яа-яЁё]/.test(program)) {
-        form.classList.add('hidden');
-        document.getElementById('successMsg').classList.remove('hidden');
-        return;
-      }
-
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = 'Отправка...';
-      btn.disabled = true;
-
-      const tgMessage = `🎭 Новая заявка с сайта vvma.ru!\n\n📌 Программа: ${program}\n👤 Имя и площадка: ${name}\n📞 Контакт: ${phone}`;
-
-      const mailBtn = document.getElementById('mailDirectBtn');
-      if (mailBtn) {
-        mailBtn.href = `mailto:${BACKUP_EMAIL}?subject=${encodeURIComponent('Заявка с сайта vvma.ru: ' + program)}&body=${encodeURIComponent(tgMessage)}`;
-      }
-
-      let completed = false;
-      const finishSubmission = () => {
-        if (completed) return;
-        completed = true;
-        trackGoal('lead_submit', { program: program });
-        if (program.indexOf('КП') !== -1) {
-          trackGoal('kp_request');
-        }
-        form.classList.add('hidden');
-        document.getElementById('successMsg').classList.remove('hidden');
-      };
-
-      const timer = setTimeout(finishSubmission, 4000);
-
-      sendViaGoogleScript(tgMessage, program, name, phone).finally(() => {
-        clearTimeout(timer);
-        finishSubmission();
-      });
-    }
-  </script>
-</body>
-</html>
