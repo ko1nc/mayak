@@ -170,21 +170,21 @@
             <span id="quizTopic" class="font-heading uppercase text-xs tracking-widest text-stone-500 font-bold">
               Утверждение №1
             </span>
-            <span class="font-heading uppercase text-xs tracking-widest text-brandRed font-bold">
+            <span id="quizRightHint" class="font-heading uppercase text-xs tracking-widest text-brandRed font-bold">
               Правда или миф?
             </span>
           </div>
-          <p id="quizQuestionText" class="text-base sm:text-xl font-semibold text-inkDark leading-snug">
+          <p id="quizQuestionText" class="text-base sm:text-xl font-semibold text-inkDark leading-snug whitespace-pre-line">
             Загрузка вопроса...
           </p>
         </div>
 
         <!-- Кнопки выбора (крупные для нажатия пальцем с телефона) -->
         <div id="quizButtons" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-          <button type="button" onclick="handleQuizAnswer(true)" class="rosta-btn bg-white hover:bg-stone-100 text-inkDark font-heading uppercase text-lg py-4 px-5 font-bold tracking-wider flex items-center justify-center gap-2">
+          <button type="button" id="quizBtnTrue" onclick="handleQuizAnswer(true)" class="rosta-btn bg-white hover:bg-stone-100 text-inkDark font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
             <span class="text-brandRed text-xl leading-none">✓</span> Реальный факт
           </button>
-          <button type="button" onclick="handleQuizAnswer(false)" class="rosta-btn bg-inkDark hover:bg-stone-800 text-white font-heading uppercase text-lg py-4 px-5 font-bold tracking-wider flex items-center justify-center gap-2">
+          <button type="button" id="quizBtnFalse" onclick="handleQuizAnswer(false)" class="rosta-btn bg-inkDark hover:bg-stone-800 text-white font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
             <span class="text-brandGold text-xl leading-none">✕</span> Пошлая сплетня
           </button>
         </div>
@@ -221,7 +221,7 @@
             ⚡ Главный разбор мифов
           </p>
           <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">
-            Посмотрите короткое видеообращение актёра и режиссёра Николая Пасечника — о том, какие мифы и фальшивки приписывают Маяковскому и каким он был на самом деле.
+            Посмотрите видео о том, какие мифы и фальшивки приписывают Маяковскому и каким он был на самом деле.
           </p>
         </div>
 
@@ -853,34 +853,41 @@
     // =========================================================================
     const QUIZ_DATA = [
       {
-        topic: 'Утверждение 01 • Поэзия в сети',
-        question: 'Знаменитые вирусные стихи про отношения («Мне бы женщину — белую, белую...» и «Любить — это значит в глубь двора вбежать...») написал Владимир Маяковский.',
+        topic: 'Вопрос 01 • Поэзия в сети',
+        rightHint: 'Правда или миф?',
+        question: 'Знаменитые вирусные стихи про отношения («Мне бы женщину — белую, белую...» и «Нет на свете печальней измены, чем измена себе самому») написал Владимир Маяковский.',
         isFact: false,
-        explanation: 'ПОШЛАЯ СПЛЕТНЯ! В интернете Маяковскому приписывают десятки чужих бульварных стихов. «Мне бы женщину...» написал в 1990-х поэт Борис Гунько, а «Любить — это значит...» — переделка строк Бориса Пастернака.'
+        explanation: 'ПОШЛАЯ СПЛЕТНЯ! Маяковский никогда не писал этой бульварщины. «Мне бы женщину — белую, белую...» сочинил в 1990-х поэт Борис Гунько, а интернет-паблики приписали эти строки классику.'
       },
       {
-        topic: 'Утверждение 02 • Парижская легенда',
-        question: 'Уезжая из Парижа, Маяковский положил весь гонорар в банк цветочной фирмы, чтобы Татьяне Яковлевой приносили букеты даже спустя десятилетия после его смерти.',
+        topic: 'Вопрос 02 • Миф о хулигане',
+        rightHint: 'Правда или миф?',
+        question: 'Маяковский не имел художественного образования, ненавидел классическую литературу и всерьёз требовал запретить Пушкина в советских школах.',
         isFact: false,
-        explanation: 'ПОШЛАЯ СПЛЕТНЯ! Эту красивую сказку выдумал в 1970-х журналист Аркадий Рывлин. В реальности советским гражданам в Париже выдавались крошечные суточные, и у поэта едва хватало франков на обратный билет.'
+        explanation: 'ПОШЛАЯ СПЛЕТНЯ! Маяковский профессионально учился в Училище живописи, ваяния и зодчества, знал «Евгения Онегина» наизусть, а в стихотворении «Юбилейное» обращался к Пушкину: «Я люблю вас, но живого, а не мумию».'
       },
       {
-        topic: 'Утверждение 03 • Реклама и бренд',
-        question: 'Маяковский был топовым копирайтером своей эпохи: вместе с Александром Родченко он создавал рекламу для резиновых галош, сосок-пустышек, печенья и карамели.',
+        topic: 'Вопрос 03 • Роковая муза',
+        rightHint: 'Правда или миф?',
+        question: 'Лиля Брик действительно говорила: «Володя так страдает, когда я его мучаю — пусть плачет, от этого он пишет гениальные стихи».',
         isFact: true,
-        explanation: 'РЕАЛЬНЫЙ ФАКТ! Творческий тандем «Реклам-конструктор Маяковский — Родченко» создал визуальный код русского авангарда, а слоган «Нигде кроме, как в Моссельпроме» знал каждый житель страны.'
+        explanation: 'РЕАЛЬНЫЙ ФАКТ! Лиля Юрьевна была убеждена, что страдания и эмоциональные качели полезны для таланта Маяковского: помучается — и напишет гениальные стихи.'
       },
       {
-        topic: 'Утверждение 04 • «Дневник» Лили Брик',
-        question: 'Лиля Брик записала в своём дневнике фразу: «Володя так страдает, когда я его мучаю — пусть плачет, от этого он пишет гениальные стихи».',
-        isFact: false,
-        explanation: 'ПОШЛАЯ СПЛЕТНЯ! Стопроцентная интернет-фальшивка. В реальных дневниках, мемуарах и переписке Лили Брик такой цитаты никогда не существовало — её выдумали авторы жёлтых пабликов ради кликов.'
-      },
-      {
-        topic: 'Утверждение 05 • За бронёй трибуна',
-        question: 'Грозный двухметровый бунтарь в жизни был патологическим чистюлей: возил в чемодане резиновый таз-ванну, боялся инфекций и подбирал на улице бездомных щенков.',
+        topic: 'Вопрос 04 • За бронёй трибуна',
+        rightHint: 'Правда или миф?',
+        question: 'Грозный двухметровый бунтарь в жизни был патологическим чистюлей: возил в чемодане резиновый таз-ванну, панически боялся инфекций и после рукопожатий обрабатывал руки одеколоном.',
         isFact: true,
-        explanation: 'РЕАЛЬНЫЙ ФАКТ! После гибели отца от заражения крови поэт панически следил за чистотой, а за бронёй горлана-главаря скрывался невероятно ранимый человек, обожавший собак и даже подписывавший письма словом «Щен».'
+        explanation: 'РЕАЛЬНЫЙ ФАКТ! После смерти отца, уколовшего палец иголкой и умершего от заражения крови, Маяковский всю жизнь боялся инфекций, избегал дверных ручек и всегда носил с собой флакон одеколона для дезинфекции рук.'
+      },
+      {
+        topic: 'Вопрос 05 • Финальная дуэль',
+        rightHint: 'Выбери стих поэта',
+        question: 'Какой его стих — «Вы любите розы?» или:\n«Все чаще думаю —\nне поставить ли лучше\nточку пули в своем конце»?',
+        btnTrueHtml: '«Все чаще думаю — не поставить ли лучше точку пули...»',
+        btnFalseHtml: '«Вы любите розы?..»',
+        isFact: true,
+        explanation: 'В ТОЧКУ! Строки «Все чаще думаю — не поставить ли лучше точку пули в своем конце» Маяковский написал ещё в 1915 году в прологе к поэме «Флейта-позвоночник». А грубый стишок «Вы любите розы? А я на них срал!» он никогда не писал — это чужая пародия.'
       }
     ];
 
@@ -926,8 +933,20 @@
 
       document.getElementById('quizStepBadge').innerText = `Выстрел ${numStr} / ${totalStr}`;
       document.getElementById('quizTopic').innerText = item.topic;
+      document.getElementById('quizRightHint').innerText = item.rightHint || 'Правда или миф?';
       document.getElementById('quizQuestionText').innerText = item.question;
       document.getElementById('quizProgressBar').style.width = `${((currentQuizIndex + 1) / QUIZ_DATA.length) * 100}%`;
+
+      const btnTrue = document.getElementById('quizBtnTrue');
+      const btnFalse = document.getElementById('quizBtnFalse');
+
+      if (item.btnTrueHtml && item.btnFalseHtml) {
+        btnTrue.innerHTML = item.btnTrueHtml;
+        btnFalse.innerHTML = item.btnFalseHtml;
+      } else {
+        btnTrue.innerHTML = '<span class="text-brandRed text-xl leading-none">✓</span> Реальный факт';
+        btnFalse.innerHTML = '<span class="text-brandGold text-xl leading-none">✕</span> Пошлая сплетня';
+      }
 
       document.getElementById('quizButtons').classList.remove('hidden');
       document.getElementById('quizFeedback').classList.add('hidden');
@@ -982,7 +1001,7 @@
 
       if (quizScore === 5) {
         titleEl.innerText = 'Блестяще! Товарищ Маяковский жмёт вам руку!';
-        descEl.innerText = 'Вас не проведёшь жёлтыми заголовками и поддельными цитатами из пабликов — вы отлично чувствуете стиль и правду эпохи.';
+        descEl.innerText = 'Вас не проведёшь жёлтыми заголовками и поддельными стихами из пабликов — вы отлично чувствуете стиль и правду эпохи.';
       } else if (quizScore >= 3) {
         titleEl.innerText = 'Достойный выстрел! Но мифы коварны';
         descEl.innerText = 'Вы хорошо отличаете правду от вымысла, но пара популярных интернет-легенд всё же смогла вас запутать.';
