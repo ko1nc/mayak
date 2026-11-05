@@ -628,14 +628,12 @@
       <span class="text-xs uppercase tracking-widest text-brandRed font-bold">Организация показов и гастролей</span>
       <h3 class="font-heading text-3xl uppercase font-bold mt-1 mb-4 text-inkDark">Оставить заявку</h3>
       
-      <form id="bookingForm" name="booking" method="POST" data-netlify="true" netlify-honeypot="website_url" onsubmit="submitForm(event)" class="space-y-4">
+      <form id="bookingForm" name="booking" method="POST" data-netlify="true" netlify-honeypot="bot_check_field" onsubmit="submitForm(event)" class="space-y-4">
         <input type="hidden" name="form-name" value="booking">
 
-        <!-- Скрытые поля-ловушки (Honeypot) против спам-ботов -->
+        <!-- Скрытое поле-ловушка (Honeypot) против спам-ботов -->
         <div class="hp-trap" aria-hidden="true">
-          <label for="hpWebsite">Ваш сайт (не заполнять)</label>
-          <input type="text" name="website_url" id="hpWebsite" tabindex="-1" autocomplete="off" value="">
-          <input type="text" name="_honey" id="hpHoney" tabindex="-1" autocomplete="off" value="">
+          <input type="text" name="bot_check_field" id="hpTrapInput" tabindex="-1" autocomplete="new-password" value="">
         </div>
 
         <div>
@@ -704,27 +702,14 @@
       if (el && PHOTOS[key]) el.src = PHOTOS[key];
     });
 
-    const PERSONAL_MAX_LINK = 'https://web.max.ru/';
+    // Снимаем старую блокировку из localStorage, если она осталась от прошлого теста
+    try { localStorage.removeItem('vvma_last_submit'); } catch (e) {}
 
-    // Переменные антибот-защиты
-    let isHumanInteracted = false;
-    let isModalOpened = false;
-    let modalOpenedAt = 0;
-    let hasUserTyped = false;
+    const PERSONAL_MAX_LINK = 'https://web.max.ru/';
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.personal-max-link').forEach(link => {
         link.href = PERSONAL_MAX_LINK;
-      });
-
-      // Отслеживание реального ввода или автозаполнения в полях формы
-      ['nameInput', 'phoneInput'].forEach(id => {
-        const inputEl = document.getElementById(id);
-        if (inputEl) {
-          inputEl.addEventListener('input', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
-          inputEl.addEventListener('change', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
-          inputEl.addEventListener('keydown', () => { hasUserTyped = true; isHumanInteracted = true; }, { passive: true });
-        }
       });
     });
 
@@ -739,7 +724,7 @@
     }
 
     // =========================================================================
-    // АВТОУВЕДОДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
+    // АВТОУВЕДОМЛЕНИЯ: TELEGRAM + ПОЧТА (GMAIL + FORMSUBMIT) + БОТ MAX
     // =========================================================================
     const TG_BOT_TOKEN = '8962021789:AAEfzn63bp5JuaiZAc-dLwFfaCMWeRu0Qkg';
     const TG_CHAT_ID = '57473050';
@@ -747,6 +732,9 @@
     const FORMSUBMIT_TOKEN = '308947d6baa3b1a2000c7e9a47ca7edd';
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvr3-YQCb6mudHDTdYH7broiyzAkEcM1CjnS1abb2YdtKCUXqHjEeZ2Eh9vrtY_j0GiQ/exec';
     const MAX_BOT_TOKEN = 'f9LHodD0cOLGeaYy8TzD_3zw8aVzz6WsY9Naa8PpMCCxyju4prOgVIawjMhnxSV63RgHPpZLGhNXn0navnj8';
+
+    let isHumanInteracted = false;
+    let isModalOpened = false;
 
     window.addEventListener('pointermove', () => { isHumanInteracted = true; }, { once: true, passive: true });
     window.addEventListener('touchstart', () => { isHumanInteracted = true; }, { once: true, passive: true });
@@ -770,11 +758,10 @@
     function openModal(programName) {
       isHumanInteracted = true;
       isModalOpened = true;
-      modalOpenedAt = Date.now();
       trackGoal('open_modal', { program: programName });
       document.getElementById('programInput').value = programName;
-      document.getElementById('hpWebsite').value = '';
-      document.getElementById('hpHoney').value = '';
+      const trap = document.getElementById('hpTrapInput');
+      if (trap) trap.value = '';
       document.getElementById('bookingForm').classList.remove('hidden');
       document.getElementById('successMsg').classList.add('hidden');
       document.getElementById('submitBtn').innerText = 'Отправить заявку';
@@ -793,62 +780,14 @@
         .finally(() => clearTimeout(id));
     }
 
-    function isTelegramOk(bodyText) {
-      if (!bodyText) return false;
-      const str = typeof bodyText === 'string' ? bodyText : JSON.stringify(bodyText);
-      return str.indexOf('"ok":true') !== -1 || str.indexOf('\\"ok\\":true') !== -1;
-    }
-
-    function fireJsonpGateway(fullGetUrl) {
-      return new Promise(resolve => {
-        try {
-          const cbName = 'tg_cb_' + Math.floor(Math.random() * 1000000);
-          const script = document.createElement('script');
-          const timer = setTimeout(() => {
-            cleanup();
-            resolve(false);
-          }, 4500);
-          function cleanup() {
-            clearTimeout(timer);
-            try { delete window[cbName]; } catch (e) {}
-            if (script.parentNode) script.parentNode.removeChild(script);
-          }
-          window[cbName] = function(data) {
-            cleanup();
-            if (isTelegramOk(data)) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          };
-          script.src = `https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&callback=${cbName}&_=${Date.now()}`;
-          script.onerror = function() { cleanup(); resolve(false); };
-          document.body.appendChild(script);
-        } catch (e) {
-          resolve(false);
-        }
-      });
-    }
-
-    // 1. Безотказная отправка через Google Cloud шлюз (доставляет в ТГ, на почту от ko1nc1@gmail.com и в бот MAX)
+    // Отправка ровно 1 запроса через Google Cloud шлюз (доставляет по 1 сообщению в ТГ, на почту и в MAX)
     async function sendViaGoogleScript(text, program, name, contact) {
       if (!GOOGLE_SCRIPT_URL) return false;
       const chatId = TG_CHAT_ID.trim();
       const emailSubject = `🎭 Заявка vvma.ru: ${program}`;
-      const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
 
       try {
-        const img = new Image();
-        img.src = urlWithParams;
-      } catch (e) {}
-
-      await Promise.allSettled([
-        fetchWithTimeout(urlWithParams, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-store'
-        }, 4000),
-        fetchWithTimeout(GOOGLE_SCRIPT_URL, {
+        await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -862,123 +801,21 @@
             contact: contact,
             max_token: MAX_BOT_TOKEN
           })
-        }, 4000)
-      ]);
-      return true;
-    }
-
-    // 2. Отправка в Telegram + вызов Google Cloud шлюза
-    async function sendToTelegram(text, program, name, contact) {
-      if (!TG_BOT_TOKEN) return false;
-      const chatId = TG_CHAT_ID.trim();
-      const baseApi = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
-      const query = `?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
-      const fullGetUrl = `${baseApi}${query}`;
-
-      await sendViaGoogleScript(text, program, name, contact);
-
-      try {
-        const resDirect = await fetchWithTimeout(baseApi, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ chat_id: chatId, text: text }).toString()
-        }, 2500);
-        if (resDirect.ok) {
-          const t = await resDirect.text();
-          if (isTelegramOk(t)) return true;
-        }
-      } catch (e) {}
-
-      const proxyUrls = [
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fullGetUrl)}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(fullGetUrl)}&_=${Date.now()}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(fullGetUrl)}`,
-        `https://corsproxy.org/?${encodeURIComponent(fullGetUrl)}`,
-        `https://thingproxy.freeboard.io/fetch/${fullGetUrl}`
-      ];
-
-      const proxyTasks = proxyUrls.map(async (gw) => {
-        const res = await fetchWithTimeout(gw, { cache: 'no-store' }, 5500);
-        if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
-        const bodyText = await res.text();
-        if (isTelegramOk(bodyText)) return true;
-        throw new Error('Bad payload');
-      });
-
-      proxyTasks.push(
-        fireJsonpGateway(fullGetUrl).then(ok => {
-          if (!ok) throw new Error('JSONP failed');
-          return true;
-        })
-      );
-
-      try {
-        await Promise.any(proxyTasks);
+        }, 4500);
         return true;
-      } catch (e) {}
-
-      return false;
-    }
-
-    // 3. Дополнительная отправка на почту по вашему токену FormSubmit (308947d6baa3b1a2000c7e9a47ca7edd)
-    async function sendBackupEmail(program, name, contact) {
-      const subj = `🎭 Заявка с сайта vvma.ru: ${program}`;
-      const payload = JSON.stringify({
-        _subject: subj,
-        _captcha: 'false',
-        _honey: '',
-        Программа: program,
-        Организация_и_Имя: name,
-        Контакт: contact,
-        _template: 'table'
-      });
-
-      await Promise.allSettled([
-        fetchWithTimeout(`https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: payload
-        }, 4000),
-        fetchWithTimeout(`https://formsubmit.co/ajax/${BACKUP_EMAIL}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: payload
-        }, 4000)
-      ]);
-    }
-
-    // Проверка на спам-бота перед отправкой
-    function isSpamBot(program, name, phone) {
-      const hp1 = (document.getElementById('hpWebsite')?.value || '').trim();
-      const hp2 = (document.getElementById('hpHoney')?.value || '').trim();
-
-      // 1. Сработала скрытая ловушка Honeypot
-      if (hp1 !== '' || hp2 !== '') return true;
-
-      // 2. Форма отправлена без открытия окна, без движений/ввода или быстрее чем за 2 секунды
-      const timeSpent = Date.now() - modalOpenedAt;
-      if (!isModalOpened || !isHumanInteracted || !hasUserTyped || timeSpent < 2000) return true;
-
-      // 3. Проверка корректности программы и наличия кириллицы в имени
-      if (!/[А-Яа-яЁё]/.test(program) || !/[А-Яа-яЁё]/.test(name) || name.length < 2) return true;
-
-      // 4. Запрет ссылок в полях имени и контакта
-      const urlRegex = /https?:\/\/|www\.|\.ru\/|\.com\//i;
-      if (urlRegex.test(name) || urlRegex.test(phone)) return true;
-
-      // 5. Контакт должен содержать либо минимум 7 цифр (телефон), либо символ @ (почта/ник)
-      const digitsCount = (phone.match(/\d/g) || []).length;
-      const hasAtSymbol = phone.indexOf('@') !== -1;
-      if (digitsCount < 7 && !hasAtSymbol) return true;
-
-      // 6. Защита от частых повторных отправок (не чаще 1 раза в 45 секунд)
-      try {
-        const lastSubmit = parseInt(localStorage.getItem('vvma_last_submit') || '0', 10);
-        if (Date.now() - lastSubmit < 45000) return true;
-      } catch (e) {}
-
-      return false;
+      } catch (e) {
+        try {
+          const urlWithParams = `${GOOGLE_SCRIPT_URL}?token=${encodeURIComponent(TG_BOT_TOKEN)}&chat_id=${encodeURIComponent(chatId)}&subject=${encodeURIComponent(emailSubject)}&text=${encodeURIComponent(text)}&_=${Date.now()}`;
+          await fetchWithTimeout(urlWithParams, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'no-store'
+          }, 4000);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
     }
 
     function submitForm(e) {
@@ -987,18 +824,15 @@
       const program = document.getElementById('programInput').value.trim();
       const name = document.getElementById('nameInput').value.trim();
       const phone = document.getElementById('phoneInput').value.trim();
+      const trapVal = (document.getElementById('hpTrapInput')?.value || '').trim();
       const form = document.getElementById('bookingForm');
 
-      // Если это спам-бот — тихо показываем «Заявка принята», но ничего не отправляем и не триггерим Метрику
-      if (isSpamBot(program, name, phone)) {
+      // Блокируем только если сработала скрытая ловушка Honeypot или окно не открывалось человеком
+      if (trapVal !== '' || !isModalOpened || !/[А-Яа-яЁё]/.test(program)) {
         form.classList.add('hidden');
         document.getElementById('successMsg').classList.remove('hidden');
         return;
       }
-
-      try {
-        localStorage.setItem('vvma_last_submit', String(Date.now()));
-      } catch (err) {}
 
       const btn = document.getElementById('submitBtn');
       btn.innerText = 'Отправка...';
@@ -1025,10 +859,7 @@
 
       const timer = setTimeout(finishSubmission, 4000);
 
-      Promise.allSettled([
-        sendToTelegram(tgMessage, program, name, phone),
-        sendBackupEmail(program, name, phone)
-      ]).then(() => {
+      sendViaGoogleScript(tgMessage, program, name, phone).finally(() => {
         clearTimeout(timer);
         finishSubmission();
       });
