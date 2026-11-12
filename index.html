@@ -201,10 +201,10 @@
 
         <!-- Кнопки выбора (крупные для нажатия пальцем с телефона) -->
         <div id="quizButtons" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-          <button type="button" id="quizBtnTrue" onclick="handleQuizAnswer(true)" class="rosta-btn bg-white hover:bg-stone-100 text-inkDark font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
+          <button type="button" id="quizBtnTrue" onclick="handleQuizAnswer(true, event)" class="rosta-btn bg-white hover:bg-stone-100 text-inkDark font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
             <span class="text-brandRed text-xl leading-none">✓</span> Реальный факт
           </button>
-          <button type="button" id="quizBtnFalse" onclick="handleQuizAnswer(false)" class="rosta-btn bg-inkDark hover:bg-stone-800 text-white font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
+          <button type="button" id="quizBtnFalse" onclick="handleQuizAnswer(false, event)" class="rosta-btn bg-inkDark hover:bg-stone-800 text-white font-heading uppercase text-base sm:text-lg py-4 px-4 font-bold tracking-wider flex items-center justify-center gap-2 text-center">
             <span class="text-brandGold text-xl leading-none">✕</span> Пошлая сплетня
           </button>
         </div>
@@ -875,6 +875,55 @@
     window.addEventListener('hashchange', checkSecretQuizRoute);
 
     // =========================================================================
+    // АНТИБОТ-ЗАЩИТА КВИЗА И ЗАЩИЩЁННАЯ ОТПРАВКА ЦЕЛИ 679113131
+    // =========================================================================
+    // 1. Засекаем время реального старта квиза (на 1-м вопросе)
+    let quizStartTime = 0;
+    let answeredCount = 0;
+    let humanMoved = false;
+
+    // Фиксируем реальное касание экрана пальцем или движение мыши
+    window.addEventListener('touchstart', () => { humanMoved = true; }, { once: true, passive: true });
+    window.addEventListener('mousemove', () => { humanMoved = true; }, { once: true, passive: true });
+    window.addEventListener('pointermove', () => { humanMoved = true; }, { once: true, passive: true });
+
+    function onFirstQuestionClick(event) {
+      if (!event || !event.isTrusted) return; // Блокируем автоклик скриптом
+      quizStartTime = Date.now();
+      answeredCount = 1;
+    }
+
+    // При каждом следующем ответе (со 2-го по 5-й вопрос):
+    function onNextQuestionClick(event) {
+      if (!event || !event.isTrusted) return;
+      answeredCount++;
+    }
+
+    // 2. Защищённая отправка цели при клике на финальную кнопку перехода к видео
+    function trackVideoTransition(event) {
+      const timeSpentSeconds = (Date.now() - quizStartTime) / 1000;
+
+      // УСЛОВИЯ ЖИВОГО ЧЕЛОВЕКА:
+      // 1) Клик физический (event.isTrusted === true)
+      // 2) Был реальный тач/движение (humanMoved === true)
+      // 3) Пройдены все 5 вопросов по очереди (answeredCount >= 5)
+      // 4) От 1-го вопроса до финала прошло минимум 18 секунд (бот кликает за 0.5 сек)
+      if (
+        event &&
+        event.isTrusted &&
+        humanMoved &&
+        answeredCount >= 5 &&
+        quizStartTime > 0 &&
+        timeSpentSeconds >= 18
+      ) {
+        if (typeof ym === 'function') {
+          ym(113768228, 'reachGoal', '679113131');
+          ym(113768228, 'reachGoal', 'quiz_to_video', { score: quizScore });
+        }
+      }
+    }
+
+    // =========================================================================
     // ЛОГИКА СКРЫТОЙ ВКЛАДКИ «ТЕСТ-ДУЭЛЬ» (5 ВОПРОСОВ)
     // =========================================================================
     const QUIZ_DATA = [
@@ -945,6 +994,8 @@
     function initQuiz() {
       currentQuizIndex = 0;
       quizScore = 0;
+      quizStartTime = 0;
+      answeredCount = 0;
       document.getElementById('quizCard').classList.remove('hidden');
       document.getElementById('quizHeader').classList.remove('hidden');
       document.getElementById('quizResultCard').classList.add('hidden');
@@ -978,7 +1029,13 @@
       document.getElementById('quizFeedback').classList.add('hidden');
     }
 
-    function handleQuizAnswer(userChoseFact) {
+    function handleQuizAnswer(userChoseFact, event) {
+      if (currentQuizIndex === 0) {
+        onFirstQuestionClick(event);
+      } else {
+        onNextQuestionClick(event);
+      }
+
       isHumanInteracted = true;
       const item = QUIZ_DATA[currentQuizIndex];
       const isCorrect = (userChoseFact === item.isFact);
@@ -1048,7 +1105,9 @@
     function finishQuizAndGoToVideo(e) {
       if (e) e.preventDefault();
       isHumanInteracted = true;
-      trackGoal('quiz_to_video', { score: quizScore });
+
+      // Проверяем все условия живого человека и отправляем защищённую цель 679113131
+      trackVideoTransition(e);
 
       // Очищаем ?quiz в адресной строке и переключаем на #video основного лендинга
       if (window.history && window.history.replaceState) {
