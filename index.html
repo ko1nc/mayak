@@ -292,10 +292,6 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-8 grid md:grid-cols-12 gap-10 items-center">
       
       <div class="md:col-span-7 space-y-6">
-        <div class="inline-flex flex-wrap items-center gap-2 bg-red-50 border border-red-200 px-3.5 py-1.5 rounded-full text-xs font-semibold text-brandRed">
-          <span>🎭 Выездные и стационарные показы • Санкт-Петербург и Москва</span>
-        </div>
-
         <h1 class="font-heading text-4xl sm:text-6xl uppercase font-bold leading-tight text-inkDark">
           Живой Маяковский <span class="text-brandRed">для школ, театров и арт-площадок</span>
         </h1>
@@ -506,8 +502,14 @@
     
     <!-- 1. Маяковский - детям -->
     <div id="play-kids" class="grid md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-10 rounded-xl border border-stone-200 shadow-sm">
-      <div class="md:col-span-5 aspect-[4/3] bg-stone-100 rounded-lg border border-stone-200 overflow-hidden relative">
-        <img id="img-kids" src="https://psv4.vkuserphoto.ru/s/v1/d2/OitWBeHCszzKfPe0nL3hZwKeo65ZUJq7WgY615nIFaVU-kNJosK0gzXHc6JfHkq94I1fi2mFsochjz1L6Za8VmKLSijGgXGm-_lrTz3_Nx0fKpVoWWPbP2XbYYXb9RUgm9o4FrAvNDtI/kids.jpg" referrerpolicy="no-referrer" alt="Маяковский — детям: актер Николай Пасечник в роли Владимира Маяковского" class="w-full h-full object-cover">
+      <div class="md:col-span-5 aspect-video bg-black rounded-lg border border-stone-200 overflow-hidden relative shadow-sm">
+        <iframe 
+          src="https://vk.ru/video_ext.php?oid=3336363&id=456239448&autoplay=0" 
+          class="w-full h-full border-0"
+          style="background-color: #000" 
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" 
+          allowfullscreen>
+        </iframe>
       </div>
       <div class="md:col-span-7 space-y-4">
         <div class="flex flex-wrap gap-2">
@@ -520,7 +522,7 @@
         </p>
         <ul class="text-sm text-stone-600 space-y-1.5 pt-1">
           <li>✓ <strong>Педагогическая ценность:</strong> в игровой форме мотивирует детей учиться, читать и уважать труд.</li>
-          <li>✓ <strong>Никакой скуки:</strong> загадки, импровизация и живой диалог с каждым рядом в зале.</li>
+          <li>✓ <strong>Никакой скуки:</strong> загадки, импровизация и живой диалог с каждым в зале.</li>
         </ul>
         <div class="flex flex-wrap gap-3 pt-3">
           <button onclick="openModal('Маяковский — детям (5+)')" class="bg-brandRed hover:bg-red-700 text-white font-heading uppercase tracking-wider px-6 py-3 rounded-sm shadow-sm transition">
@@ -843,7 +845,6 @@
   <script>
     const PHOTOS = {
       hero: 'https://sun9-85.vkuserphoto.ru/s/v1/ig2/3TdZG54QnqcccfgUqTTEDKV2ydJOGXU2Ed1j-4UHq0T4eaeU1zJrYMMn9KR84y21pLKvcOt5qoOlQRcSVH6v8YDl.jpg?quality=95&as=32x44,48x65,72x98,108x147,160x218,240x327,360x491,480x654,540x736,640x872,720x981,1080x1472,1280x1744,1440x1962,1585x2160&from=bu&u=UQP7vyGwR1_46Mo7yYpKj7lMdG-uPWM8f1aRTjX_EWQ&cs=1585x0',
-      kids: 'https://psv4.vkuserphoto.ru/s/v1/d2/OitWBeHCszzKfPe0nL3hZwKeo65ZUJq7WgY615nIFaVU-kNJosK0gzXHc6JfHkq94I1fi2mFsochjz1L6Za8VmKLSijGgXGm-_lrTz3_Nx0fKpVoWWPbP2XbYYXb9RUgm9o4FrAvNDtI/kids.jpg',
       style: 'https://psv4.vkuserphoto.ru/s/v1/d2/l3nNpcT5GaDgBu8MQan_Z54wCy6F3b5DH2scsygTljiPRW0-bIIeJ_xoW9eA_7ck_jjIcJuBIrll1xj49Z51DfEnYpP2295i_CbPyNOeE9zOJwOpxzIJX1HDGINb7e1ivza7kiOlc7U1/style.jpg',
       brik: 'https://lh3.googleusercontent.com/d/1R6k6uRTv1iV0MaN11opLoSibpyCM-fcm=w1200',
       doc1: 'https://psv4.vkuserphoto.ru/s/v1/d2/P1gWD6wtDomMW5ZvVCSXFkGM2gdnw4W8jvEjnAdWReXiU6rIbosw2meJeF79JXrN1Q48upt8Wk6AzVg7wRVQAOJ_jQQMSOp-IldB9xWVT_ZZAQqLIlo0rHoVqs7sAqZm57OU-xktFVcQ/doc1.jpg',
